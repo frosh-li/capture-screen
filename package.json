@@ -11,9 +11,9 @@
   "author": "8082410@qq.com",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^5.11.0"
+    "eslint": "5.11.0"
   },
   "dependencies": {
-    "electron": "^4.0.0"
+    "electron": "4.0.0"
   }
 }

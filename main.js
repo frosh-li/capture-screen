@@ -21,8 +21,9 @@ app.on('ready', () => {
     ipcMain.on('fullscreen', (event, arg) => {
         if (arg.type === 'setfull') {
             console.log('set full screen');
+            win.setFullScreen(true);
             win.show();
-            event.sender.send('handleEvent', 'pong')
+            event.sender.send('handleEvent', arg)
             // win.webContents.send('handleEvent'); // 窗口已经最小化
         }
 

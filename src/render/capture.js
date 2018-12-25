@@ -84,6 +84,6 @@ ipcRenderer.on('startCapture', () => {
         startCapture();
     })
 });
-ipcRenderer.on('handleEvent', () => {
-    domContentLoadedHandler()
+ipcRenderer.on('handleEvent', (event,arg) => {
+    domContentLoadedHandler(event, arg)
 });

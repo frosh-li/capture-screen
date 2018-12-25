@@ -23,5 +23,14 @@ html, body {
     position: absolute;
     display: none;
     z-index: 1;
+    background-color:white;
+
+}
+
+.bg-canvas {
+    position: absolute;
+    display: none;
+    z-index: -1;
     background-color:transparent;
+
 }
