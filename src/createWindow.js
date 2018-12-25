@@ -1,26 +1,37 @@
-const { BrowserWindow } = require('electron')
+const { BrowserWindow, ipcMain } = electron = require('electron');
+const path = require('path');
 function createWindow() {
+    const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
     let win = new BrowserWindow({ 
-        width: 1000, 
-        height: 1000, 
+        width: width, 
+        height: height, 
         frame: false, 
-        transparent: true,
-        minimizable: false,
+        transparent: false,
         alwaysOnTop: true,
         show: false,
-        resizable: false,
+        fullscreenable: false,
         fullscreen: true,
+        resizable: false,
+        maximize: false,
+        maximizable: false,
+        enableLargerThanScreen: true,
+        minimizable: false,
+        modal: true,
     })
-    //win.setAlwaysOnTop(true);
     
     win.on('closed', () => {
         win = null
     })
 
     // 或加载本地HTML文件
-    win.loadURL(`file://${__dirname}/assets/index.html`);
+    win.loadFile(path.join(__dirname,'assets/index.html'));
+    win.webContents.on('did-finish-load', () => {
+        win.webContents.send('startCapture'); // 窗口已经最小化
+    })
+    win.webContents.openDevTools();
+
     
-    // win.webContents.openDevTools();
+    
     return win;
 }
 

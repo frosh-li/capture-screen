@@ -1,63 +1,74 @@
 // In the renderer process.
+console.log('preload');
 const {
     desktopCapturer,
     remote,
     screen,
     ipcRenderer,
 } = require('electron')
-const fs = require('fs');
-desktopCapturer.getSources({
-    types: ['screen']
-}, (error, sources) => {
-    if (error) throw error
-    let curSource = sources[0];
 
-    navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: {
-                mandatory: {
-                    chromeMediaSource: 'desktop',
-                    chromeMediaSourceId: curSource.id,
-                    minWidth: 1280,
-                    maxWidth: 8000,
-                    minHeight: 720,
-                    maxHeight: 8000
+const domContentLoadedHandler = require('../draw/canvas');
+const fs = require('fs');
+
+function startCapture() {
+    desktopCapturer.getSources({
+        types: ['screen']
+    }, (error, sources) => {
+        if (error) throw error
+        let curSource = sources[0];
+    
+        navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: {
+                    mandatory: {
+                        chromeMediaSource: 'desktop',
+                        chromeMediaSourceId: curSource.id,
+                        minWidth: 1280,
+                        maxWidth: 8000,
+                        minHeight: 720,
+                        maxHeight: 8000,
+                    }
                 }
-            }
-        }).then((stream) => handleStream(stream))
-        .catch((e) => handleError(e))
-})
+            }).then((stream) => handleStream(stream))
+            .catch((e) => handleError(e))
+    })
+}
+
 
 function handleStream(stream) {
     const video = document.createElement('video');
     video.srcObject = stream;
     let hasShot = false;
     video.onloadedmetadata = (e) => {
+        console.log('metaloaded');
         if (hasShot) {
             return;
         }
         hasShot = true;
         video.play();
-        setTimeout(() => {
-            video.pause();
-            let canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            console.log(video.videoHeight, video.videoWidth);
-            let ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            let imageData = canvas.toDataURL('image/png', 1);
-            
-            document.body.style.backgroundImage = `url(${imageData})`;
+        video.pause();
+        let canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        let imageData = canvas.toDataURL('image/png', 1);
+        
+        document.body.style.backgroundImage = `url(${imageData})`;
+        document.body.removeChild(video);
 
-            fs.writeFileSync('./screenshot.png', imageData);
-            video.remove();
-            ipcRenderer.sendSync('fullscreen', {
+        const tracks = stream.getTracks()
+        tracks[0].stop()
+
+        fs.writeFileSync('./screenshot.png', imageData);
+        
+        setImmediate(() => {
+            ipcRenderer.send('fullscreen', {
                 type: 'setfull',
                 width: canvas.width,
                 height: canvas.height,
             }); // 通知最大化窗口
-        },200);
+        });   
     }
 
     document.body.appendChild(video);
@@ -66,3 +77,13 @@ function handleStream(stream) {
 function handleError(e) {
     console.log(e)
 }
+
+ipcRenderer.on('startCapture', () => {
+    console.log('startCapture');
+    setImmediate(() => {
+        startCapture();
+    })
+});
+ipcRenderer.on('handleEvent', () => {
+    domContentLoadedHandler()
+});

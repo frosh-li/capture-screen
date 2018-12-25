@@ -22,6 +22,8 @@ app.on('ready', () => {
         if (arg.type === 'setfull') {
             console.log('set full screen');
             win.show();
+            event.sender.send('handleEvent', 'pong')
+            // win.webContents.send('handleEvent'); // 窗口已经最小化
         }
 
         if (arg.type === 'setmin') {

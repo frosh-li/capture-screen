@@ -18,3 +18,10 @@ html, body {
     background-color: #000000;
     opacity: 0.5;
 }
+
+.js-canvas {
+    position: absolute;
+    display: none;
+    z-index: 1;
+    background-color:transparent;
+}
