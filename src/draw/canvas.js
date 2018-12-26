@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const {CanvasMousedown, CanvasMouseup, CanvasMousemove, drawTools, hideTools} = require('./canvasHandle');
 function domContentLoadedHandler(event, arg) {
+    
     console.log('lets go, dom content loaded', arg);
     let mousedown = false;
     let hasLoadImage = true;
@@ -90,6 +91,9 @@ function domContentLoadedHandler(event, arg) {
         },0)
     }
 
+
+    const Toolbar = require('../draw/tools');
+    new Toolbar().init();
 }
 
 module.exports = domContentLoadedHandler;

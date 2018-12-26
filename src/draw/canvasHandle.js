@@ -48,6 +48,7 @@ function CanvasMousedown(e) {
 
     canvasWidth = canvas.width;
     canvasHeight = canvas.height;
+    hideTools();
 }
 
 function CanvasMousemove(e) {
@@ -71,6 +72,12 @@ function CanvasMouseup(e) {
     e.preventDefault();
     document.body.style.cursor='default'; 
     mousedown = false;
+    let dis_x = ePoint.x - sPoint.x;
+    let dis_y = ePoint.y - sPoint.y;
+    drawTools([
+        parseInt(canvas.style.left) + canvasWidth,
+        parseInt(canvas.style.top) + canvasHeight,
+    ])
 }
 
 function dragCanvas() {
@@ -117,11 +124,9 @@ function dragCanvas() {
 function drawTools(curPoint) {
     let tools = document.querySelector("#js-toolbar");
     tools.style.display = '-webkit-flex';   
-    setTimeout(() => {
-        let width = tools.offsetWidth;
-        tools.style.left = (curPoint[0] - parseInt(width)) + 'px';
-        tools.style.top = (curPoint[1]) + 'px';
-    },0)
+    let width = tools.offsetWidth;
+    tools.style.left = (curPoint[0] - parseInt(width)) + 'px';
+    tools.style.top = (curPoint[1]) + 'px';
 }
 
 function hideTools() {

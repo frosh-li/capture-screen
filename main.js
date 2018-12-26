@@ -31,6 +31,11 @@ app.on('ready', () => {
             win.minimize();
         }
     });
+
+    ipcMain.on('closeapp', () => {
+        win.close();
+        app.quit();
+    })
     
 });
 
