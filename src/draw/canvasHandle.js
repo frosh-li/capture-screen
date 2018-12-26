@@ -2,7 +2,11 @@ module.exports = {
     CanvasMousedown,
     CanvasMouseup, 
     CanvasMousemove,
+    drawTools,
+    hideTools,
 };
+
+const { width: screenWidth, height: screenHeight } = require('electron').screen.getPrimaryDisplay().bounds;
 
 let canvas = document.querySelector('#js-canvas');
 let bgCanvas = document.querySelector('#bg-canvas');
@@ -16,7 +20,6 @@ let canvasWidth = canvas.width;
 let canvasHeight = canvas.height;
 
 let mousedown = false;
-let inmove = false;
 let sPoint = {
     x: 0,
     y: 0,
@@ -50,11 +53,9 @@ function CanvasMousedown(e) {
 function CanvasMousemove(e) {
     e.stopPropagation();
     e.preventDefault();
-    if (!mousedown || inmove) {
+    if (!mousedown) {
         return;
     }
-
-    inmove = true;
 
     ePoint = {
         x: e.clientX,
@@ -70,12 +71,30 @@ function CanvasMouseup(e) {
     e.preventDefault();
     document.body.style.cursor='default'; 
     mousedown = false;
-    inmove = false;
 }
 
 function dragCanvas() {
     let dis_x = ePoint.x - sPoint.x;
     let dis_y = ePoint.y - sPoint.y;
+
+    // 边缘检测
+
+    if (pos.left + dis_x <= 0) {
+        return;
+    }
+
+    if (pos.top + dis_y <= 0) {
+        return;
+    }
+
+    if (pos.top + dis_y + canvasHeight >= screenHeight) {
+        return;
+    }
+
+    if (pos.left + dis_x + canvasWidth >= screenWidth) {
+        return;
+    }
+
 
     canvas.style.cssText = `
         left: ${pos.left + dis_x}px; 
@@ -90,6 +109,22 @@ function dragCanvas() {
         canvasHeight,
     );
     canvas.getContext('2d').putImageData(imageData, 0, 0);
+}
 
-    inmove = false;
+/**
+ * 绘制底部工具条
+ */
+function drawTools(curPoint) {
+    let tools = document.querySelector("#js-toolbar");
+    tools.style.display = '-webkit-flex';   
+    setTimeout(() => {
+        let width = tools.offsetWidth;
+        tools.style.left = (curPoint[0] - parseInt(width)) + 'px';
+        tools.style.top = (curPoint[1]) + 'px';
+    },0)
+}
+
+function hideTools() {
+    let tools = document.querySelector("#js-toolbar");
+    tools.style.display = 'none';  
 }

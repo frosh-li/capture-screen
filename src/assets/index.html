@@ -5,12 +5,23 @@
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
   <meta name='viewport' content='width=device-width, initial-scale=1'>
   <link rel='stylesheet' href='./styles/index.css'>
+  <link rel='stylesheet' href='./iconfont/iconfont.css'>
 </head>
 <body>
     <div class='mask' id="mask">
     </div>
     <canvas class='bg-canvas' id='bg-canvas'></canvas>
     <canvas class='js-canvas' id='js-canvas'></canvas>
+    <div id="js-toolbar" class="toolbar">
+      <div class="iconfont icon-7squareo" id="btn-square"></div>
+      <div class="iconfont icon-circle" id="btn-circle"></div>
+      <div class="iconfont icon-cc-arrow-right" id="btn-arrow"></div>
+      <div class="iconfont icon-pen" id="btn-pen"></div>
+      <div class="split">|</div>
+      <div class="iconfont icon-download" id="btn-download"></div>
+      <div class="iconfont icon-close" id="btn-close"></div>
+      <div class="iconfont icon-check" id="btn-ok"></div>
+  </div>
     <script src="../zrender.min.js"></script>
     <!-- <script src="../jquery.js"></script> -->
     <script src="../render/capture.js"></script>

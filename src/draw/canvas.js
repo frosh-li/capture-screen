@@ -1,14 +1,16 @@
 const nativeImage = require('electron').nativeImage
 const fs = require('fs');
 const path = require('path');
-const {CanvasMousedown, CanvasMouseup, CanvasMousemove} = require('./canvasHandle');
+const {CanvasMousedown, CanvasMouseup, CanvasMousemove, drawTools, hideTools} = require('./canvasHandle');
 function domContentLoadedHandler(event, arg) {
     console.log('lets go, dom content loaded', arg);
-    var mousedown = false;
+    let mousedown = false;
     let hasLoadImage = true;
-    var startPoint = [0, 0];
+    let startPoint = [0, 0];
+    let curPoint = [0, 0];
     let canvas = document.querySelector('#js-canvas');
     let bgCanvas = document.querySelector('#bg-canvas');
+    
     bgCanvas.width = arg.width;
     bgCanvas.height = arg.height;
 
@@ -45,14 +47,16 @@ function domContentLoadedHandler(event, arg) {
             width: 0;
             height: 0;
         `;
+        hideTools();
     }
 
     function startDrawCanvas(e) {
-        console.log('mousemove backgrond');
+        
         if(!mousedown) {
             return;
         }
-        let curPoint = [e.clientX, e.clientY];
+        console.log('mousemove backgrond');
+        curPoint = [e.clientX, e.clientY];
         let width = e.clientX - startPoint[0];
         let height = e.clientY - startPoint[1];
         
@@ -79,9 +83,12 @@ function domContentLoadedHandler(event, arg) {
     }
 
     function endDrawCanvas(e) {
+        console.log('document mouse up');
         mousedown = false;
+        setTimeout(() => {
+            drawTools(curPoint);
+        },0)
     }
-
 
 }
 

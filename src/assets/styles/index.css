@@ -35,3 +35,40 @@ html, body {
     background-color:transparent;
 
 }
+
+.toolbar {
+    position: absolute;
+    color: #343434;
+    font-size: 12px;
+    background: #f5f5f5;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: Arial Consolas sans-serif;
+    display: none;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+    align-items: center;
+    height: 40px;
+    line-height: 40px;
+}
+
+.toolbar .iconfont {
+    font-size: 24px;
+    padding: 2px 10px;
+}
+
+.toolbar .iconfont:hover {
+    color: #000000;
+}
+
+.icon-check {
+    color: green;
+}
+
+.icon-close {
+    color: black;
+}
+
+.split {
+    margin: auto 10px;
+}
