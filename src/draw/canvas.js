@@ -1,6 +1,7 @@
 const nativeImage = require('electron').nativeImage
 const fs = require('fs');
 const path = require('path');
+const {CanvasMousedown, CanvasMouseup, CanvasMousemove} = require('./canvasHandle');
 function domContentLoadedHandler(event, arg) {
     console.log('lets go, dom content loaded', arg);
     var mousedown = false;
@@ -24,10 +25,13 @@ function domContentLoadedHandler(event, arg) {
     }
     delete htmlImage;
 
-    mask.addEventListener('mousedown', readyDrawCanvas, false);
-    mask.addEventListener('mousemove', startDrawCanvas, false);
-    mask.addEventListener('mouseup', endDrawCanvas, false);
-    mask.addEventListener('mouseout', endDrawCanvas, true);
+    document.addEventListener('mousedown', readyDrawCanvas, false);
+    document.addEventListener('mousemove', startDrawCanvas, false);
+    document.addEventListener('mouseup', endDrawCanvas, false);
+
+    canvas.addEventListener('mousedown', CanvasMousedown, false);
+    canvas.addEventListener('mousemove', CanvasMousemove, false);
+    canvas.addEventListener('mouseup', CanvasMouseup, false);
 
     function readyDrawCanvas(e) {
         console.log('mousedown backgrond');
@@ -61,6 +65,9 @@ function domContentLoadedHandler(event, arg) {
             display:block;
             height: ${height};
         `;
+        if (width === 0 || height === 0) {
+            return;
+        }
         let imageData = bgCanvas.getContext('2d').getImageData(
             startPoint[0],
             startPoint[1],
@@ -74,6 +81,8 @@ function domContentLoadedHandler(event, arg) {
     function endDrawCanvas(e) {
         mousedown = false;
     }
+
+
 }
 
 module.exports = domContentLoadedHandler;
