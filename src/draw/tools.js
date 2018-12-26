@@ -37,7 +37,8 @@ class Toolbar {
     }
 
     btnCloseClickHandle() {
-
+        remote.getCurrentWindow().hide();
+        ipcRenderer.send('closeapp');
     }
 
     btnArrowClickHandle() {
