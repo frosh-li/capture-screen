@@ -5,10 +5,13 @@ const {
     remote,
     screen,
     ipcRenderer,
+    
 } = require('electron')
 
 const domContentLoadedHandler = require('../draw/canvas');
 const fs = require('fs');
+const scaleFactor = screen.getPrimaryDisplay().scaleFactor;
+console.log('屏幕缩放比', screen.getPrimaryDisplay().scaleFactor);
 
 function startCapture() {
     desktopCapturer.getSources({
@@ -48,12 +51,13 @@ function handleStream(stream) {
         video.play();
         video.pause();
         let canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth / scaleFactor;
+        canvas.height = video.videoHeight / scaleFactor;
         let ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         let imageData = canvas.toDataURL('image/png', 1);
-        
+        // document.body.style.width = video.videoWidth + 'px';
+        // document.body.style.height = video.videoHeight + 'px';
         document.body.style.backgroundImage = `url(${imageData})`;
         document.body.removeChild(video);
 
@@ -61,7 +65,7 @@ function handleStream(stream) {
         tracks[0].stop()
 
         fs.writeFileSync('./screenshot.png', imageData);
-        
+        fs.writeFileSync('./screenshot_main.png', new Buffer(imageData.replace('data:image/png;base64,',''), 'base64'));
         setImmediate(() => {
             ipcRenderer.send('fullscreen', {
                 type: 'setfull',
