@@ -22,6 +22,7 @@ app.on('ready', () => {
         if (arg.type === 'setfull') {
             console.log('set full screen');
             win.setFullScreen(true);
+            win.maximize()
             win.show();
             event.sender.send('handleEvent', arg)
             // win.webContents.send('handleEvent'); // 窗口已经最小化

@@ -6,7 +6,7 @@ function domContentLoadedHandler(event, arg) {
     
     console.log('lets go, dom content loaded', arg);
     let mousedown = false;
-    let hasLoadImage = true;
+    
     let startPoint = [0, 0];
     let curPoint = [0, 0];
     let canvas = document.querySelector('#js-canvas');
