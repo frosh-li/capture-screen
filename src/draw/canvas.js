@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const {CanvasMousedown, CanvasMouseup, CanvasMousemove, drawTools, hideTools} = require('./canvasHandle');
 const scaleFactor = require('electron').screen.getPrimaryDisplay().scaleFactor;
+
 function domContentLoadedHandler(event, arg) {
     
     console.log('lets go, dom content loaded', arg);
@@ -101,6 +102,17 @@ function domContentLoadedHandler(event, arg) {
 
     const Toolbar = require('../draw/tools');
     new Toolbar().init();
+
+    eventEmitter.on('startDrawInCanvas', () => {
+        console.log('handle event');
+        document.removeEventListener('mousedown', readyDrawCanvas, false);
+        document.removeEventListener('mousemove', startDrawCanvas, false);
+        document.removeEventListener('mouseup', endDrawCanvas, false);
+
+        canvas.removeEventListener('mousedown', CanvasMousedown, false);
+        canvas.removeEventListener('mousemove', CanvasMousemove, false);
+        canvas.removeEventListener('mouseup', CanvasMouseup, false);
+    });
 }
 
 module.exports = domContentLoadedHandler;

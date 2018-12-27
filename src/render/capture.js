@@ -8,6 +8,9 @@ const {
     
 } = require('electron')
 
+let events = require('events');
+global.eventEmitter = new events.EventEmitter();
+
 const domContentLoadedHandler = require('../draw/canvas');
 const fs = require('fs');
 const scaleFactor = screen.getPrimaryDisplay().scaleFactor;
