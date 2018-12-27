@@ -7,7 +7,7 @@ module.exports = {
 };
 
 const { width: screenWidth, height: screenHeight } = require('electron').screen.getPrimaryDisplay().bounds;
-
+const scaleFactor = require('electron').screen.getPrimaryDisplay().scaleFactor;
 let canvas = document.querySelector('#js-canvas');
 let bgCanvas = document.querySelector('#bg-canvas');
 
@@ -16,8 +16,8 @@ let pos = {
     top: canvas.style.top,
 }
 
-let canvasWidth = canvas.width;
-let canvasHeight = canvas.height;
+let canvasWidth = 0;
+let canvasHeight = 0;
 
 let mousedown = false;
 let sPoint = {
@@ -46,8 +46,8 @@ function CanvasMousedown(e) {
         top: parseInt(canvas.style.top),
     }
 
-    canvasWidth = canvas.width;
-    canvasHeight = canvas.height;
+    canvasWidth = parseInt(canvas.style.width);
+    canvasHeight = parseInt(canvas.style.height);
     hideTools();
 }
 
@@ -107,15 +107,17 @@ function dragCanvas() {
         left: ${pos.left + dis_x}px; 
         top: ${pos.top + dis_y}px; 
         display: block;
+        width: ${canvasWidth}px;
+        height: ${canvasHeight};
     `;
 
     let imageData = bgCanvas.getContext('2d').getImageData(
-        pos.left + dis_x,
-        pos.top + dis_y,
-        canvasWidth,
-        canvasHeight,
+        (pos.left + dis_x) * scaleFactor,
+        (pos.top + dis_y) * scaleFactor,
+        canvasWidth * scaleFactor,
+        canvasHeight * scaleFactor,
     );
-    canvas.getContext('2d').putImageData(imageData, 0, 0);
+    canvas.getContext('2d').putImageData(imageData, 0, 0, 0, 0, canvasWidth * scaleFactor, canvasHeight * scaleFactor);
 }
 
 /**
