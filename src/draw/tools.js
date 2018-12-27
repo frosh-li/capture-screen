@@ -209,10 +209,10 @@ class Toolbar {
         if(this.shape === 'rect') {
             this.curShape.attr({
                 shape: {
-                    x: this.ePoint.x,
-                    y: this.ePoint.y,
-                    width: 0,
-                    height: 0,
+                    x: this.sPoint.x,
+                    y: this.sPoint.y,
+                    width: Math.abs(this.ePoint.x - this.sPoint.x),
+                    height: Math.abs(this.ePoint.y - this.sPoint.y),
                 },
                 style: {
                     fill: 'none',
@@ -221,10 +221,6 @@ class Toolbar {
                 },
                 draggable: true,
                 cursor: 'move',
-                buildPath: function(path, shape) {
-                    path.moveTo(path.x, path.y)
-                    path.closePath();
-                }
             })
         }
 
