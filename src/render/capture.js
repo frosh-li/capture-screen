@@ -51,8 +51,8 @@ function handleStream(stream) {
         video.play();
         video.pause();
         let canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth / scaleFactor;
-        canvas.height = video.videoHeight / scaleFactor;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
         let ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         let imageData = canvas.toDataURL('image/png', 1);

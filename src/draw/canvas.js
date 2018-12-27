@@ -2,6 +2,7 @@ const nativeImage = require('electron').nativeImage
 const fs = require('fs');
 const path = require('path');
 const {CanvasMousedown, CanvasMouseup, CanvasMousemove, drawTools, hideTools} = require('./canvasHandle');
+const scaleFactor = require('electron').screen.getPrimaryDisplay().scaleFactor;
 function domContentLoadedHandler(event, arg) {
     
     console.log('lets go, dom content loaded', arg);
@@ -61,25 +62,31 @@ function domContentLoadedHandler(event, arg) {
         let width = e.clientX - startPoint[0];
         let height = e.clientY - startPoint[1];
         
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = width * scaleFactor;
+        canvas.height = height * scaleFactor;
         canvas.style.cssText = `
             left: ${startPoint[0]}px;
             top: ${startPoint[1]}px;
-            width: ${width};
+            width: ${width}px;
             display:block;
-            height: ${height};
+            height: ${height}px;
         `;
         if (width === 0 || height === 0) {
             return;
         }
         let imageData = bgCanvas.getContext('2d').getImageData(
-            startPoint[0],
-            startPoint[1],
-            width,
-            height,
+            startPoint[0] * scaleFactor,
+            startPoint[1] * scaleFactor,
+            width * scaleFactor,
+            height * scaleFactor,
         );
-        canvas.getContext('2d').putImageData(imageData, 0, 0);
+        // let cacheCanvas = document.createElement('canvas');
+        // cacheCanvas.width = width * scaleFactor * scaleFactor;
+        // cacheCanvas.height = height * scaleFactor * scaleFactor;
+        // cacheCanvas.getContext('2d').putImageData(imageData, 0, 0, 0, 0, width * scaleFactor * scaleFactor, height * scaleFactor * scaleFactor);
+        // canvas.getContext('2d').drawImage(cacheCanvas, 0, 0, width * scaleFactor, height * scaleFactor, 0, 0, width, height);
+
+        canvas.getContext('2d').putImageData(imageData, 0, 0, 0, 0,width * scaleFactor, height * scaleFactor);
         
     }
 
