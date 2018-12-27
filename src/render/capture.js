@@ -68,7 +68,7 @@ function handleStream(stream) {
         tracks[0].stop()
 
         fs.writeFileSync('./screenshot.png', imageData);
-        fs.writeFileSync('./screenshot_main.png', new Buffer(imageData.replace('data:image/png;base64,',''), 'base64'));
+        //fs.writeFileSync('./screenshot_main.png', Buffer.from(imageData.replace('data:image/png;base64,',''), 'base64'));
         setImmediate(() => {
             ipcRenderer.send('fullscreen', {
                 type: 'setfull',

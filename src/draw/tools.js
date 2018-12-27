@@ -3,6 +3,49 @@ const fs = require('fs');
 const scaleFactor = require('electron').screen.getPrimaryDisplay().scaleFactor;
 let canBeDrawShape = false;
 let startToDrawShape = false;
+let dragingShape = false;
+let pathArray = [];
+
+// 继承箭头形状
+let ArrowShape = new zrender.Path.extend({
+    type: 'Arrow',
+    shape: {
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 0,
+    },
+    buildPath: function(path, shape) {
+        const {x1, x2, y1, y2} = shape;
+
+        let angle = Math.atan2((y1-y2), (x2-x1)) //弧度  0.6435011087932844
+        let theta = angle*(180/Math.PI); //角度  36.86989764584402
+        console.log('角度', theta);
+        let dis = Math.sqrt(Math.pow(Math.abs(x1-x2), 2) + Math.pow(Math.abs(y1 - y2), 2));
+        path.moveTo(x1, y1);
+        path.lineTo(
+            x1 + (dis - 20) * Math.cos((theta - 2)*Math.PI/180),
+            y1 - (dis - 20) * Math.sin((theta - 2)*Math.PI/180),
+        );
+        path.lineTo(
+            x1 + (dis - 30) * Math.cos((theta - 5)*Math.PI/180),
+            y1 - (dis - 30) * Math.sin((theta - 5)*Math.PI/180)
+        );
+        path.lineTo(x2, y2);
+        path.lineTo(
+            x1 + (dis - 30) * Math.cos((theta + 5)*Math.PI/180),
+            y1 - (dis - 30) * Math.sin((theta + 5)*Math.PI/180),
+        );
+        path.lineTo(
+            x1 + (dis - 20) * Math.cos((theta + 2)*Math.PI/180),
+            y1 - (dis - 20) * Math.sin((theta + 2)*Math.PI/180),
+        );
+
+        
+        path.lineTo(x1, y1);
+       path.closePath();
+    }
+});
 class Toolbar {
     constructor() {
         this.btnClose = document.querySelector('#btn-close');
@@ -13,9 +56,6 @@ class Toolbar {
         this.btnDownload = document.querySelector('#btn-download');
         this.btnOk = document.querySelector('#btn-ok');
         this.canvas = document.querySelector('#js-canvas');
-        // this.zcanvas = document.querySelector('#zcanvas');
-        // this.zcanvas.style.cssText = this.canvas.style.cssText;
-        // this.zcanvas.style.css
         this.audio = new Audio()
         this.audio.src = '../assets/audio/capture.mp3';
         this.btnGroup = ['btnClose','btnSquare','btnCircle','btnArrow', 'btnPen', 'btnDownload', 'btnOk'];
@@ -27,6 +67,7 @@ class Toolbar {
             let handle = `${btn}ClickHandle`;
             console.log(handle, this[btn]);
             this[btn].addEventListener('mousedown', (e) => {
+                this.setToolbarHighlight(btn);
                 eventEmitter.emit('startDrawInCanvas');
                 if (canBeDrawShape === false) {
                     this.initZrender();
@@ -41,12 +82,23 @@ class Toolbar {
         })
     }
 
+    //高亮当前图形按钮
+    setToolbarHighlight(btn) {
+        // console.log('highlight btn', btn);
+        this.btnGroup.forEach((_btn) => {
+            if(btn === _btn) {
+                console.log('highlight btn', btn, this[btn]);
+                this[_btn].style.color='red';
+            }else{
+                this[_btn].style.color='#333';
+            }
+        });
+    }
+
     /**
      * 将背景图绘制上来
      */
     initZrender() {
-        
-
         let tmpCanvas = document.createElement('canvas');
         tmpCanvas.width = this.canvas.width;
         tmpCanvas.height = this.canvas.height;
@@ -81,7 +133,7 @@ class Toolbar {
         startToDrawShape = false;
     }
     mousedown(e) {
-        if(!this.shape) {
+        if(!this.shape || dragingShape) {
             return;
         }
         startToDrawShape = true;
@@ -97,6 +149,7 @@ class Toolbar {
                     r: 1,
                 },
             });
+            this.setEvents(this.curShape);
             this.zr.add(this.curShape);
         }
 
@@ -109,8 +162,40 @@ class Toolbar {
                     height: 1,
                 },
             });
+            this.setEvents(this.curShape);
             this.zr.add(this.curShape);
         }
+
+        if(this.shape === 'path') {
+            pathArray = [[this.sPoint.x, this.sPoint.y]]
+            this.curShape = new zrender.Polyline({
+                shape: {
+                    points: pathArray,
+                },
+            });
+            this.setEvents(this.curShape);
+            this.zr.add(this.curShape);
+        }
+
+        if(this.shape === 'arrow') {
+            this.curShape = new ArrowShape({
+                shape: {
+                    x1: 0,
+                    y1: 0,
+                    x2: 0,
+                    y2: 0,
+                },
+            });
+            this.setEvents(this.curShape);
+            this.zr.add(this.curShape);
+        }
+    }
+    setEvents(curShape) {
+        curShape.on('mousedown', function() {
+            dragingShape = true;
+        }).on('mouseup', () => {
+            dragingShape = false;
+        });
     }
     mousemove(e) {
         if(!startToDrawShape || !this.shape) {
@@ -124,10 +209,10 @@ class Toolbar {
         if(this.shape === 'rect') {
             this.curShape.attr({
                 shape: {
-                    x: this.sPoint.x,
-                    y: this.sPoint.y,
-                    width: Math.abs(this.ePoint.x - this.sPoint.x),
-                    height: Math.abs(this.ePoint.y - this.sPoint.y),
+                    x: this.ePoint.x,
+                    y: this.ePoint.y,
+                    width: 0,
+                    height: 0,
                 },
                 style: {
                     fill: 'none',
@@ -136,6 +221,10 @@ class Toolbar {
                 },
                 draggable: true,
                 cursor: 'move',
+                buildPath: function(path, shape) {
+                    path.moveTo(path.x, path.y)
+                    path.closePath();
+                }
             })
         }
 
@@ -155,6 +244,41 @@ class Toolbar {
                 cursor: 'move',
             })
         }
+
+        if(this.shape === 'path') {
+            pathArray.push([this.ePoint.x, this.ePoint.y]);
+            console.log(pathArray);
+            this.curShape.attr({
+                shape: {
+                    points: pathArray
+                },
+                style: {
+                    fill: 'none',
+                    stroke: 'red',
+                    lineWidth: 4,
+                },
+                draggable: true,
+                cursor: 'move',
+            });
+        }
+
+        if(this.shape === 'arrow') {
+            this.curShape.attr({
+                shape: {
+                    x1: this.sPoint.x,
+                    y1: this.sPoint.y,
+                    x2: this.ePoint.x,
+                    y2: this.ePoint.y,
+                },
+                style: {
+                    fill: 'red',
+                    stroke: 'red',
+                    lineWidth: 1,
+                },
+                draggable: true,
+                cursor: 'move',
+            });
+        }
     }
 
     btnCircleClickHandle() {
@@ -172,11 +296,11 @@ class Toolbar {
     }
 
     btnArrowClickHandle() {
-
+        this.shape = 'arrow';
     }
 
     btnPenClickHandle() {
-
+        this.shape = 'path';
     }
 
     btnDownloadClickHandle() {
