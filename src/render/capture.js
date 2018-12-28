@@ -2,12 +2,10 @@
 console.log('preload');
 const {
     desktopCapturer,
-    remote,
     screen,
     ipcRenderer,
     
 } = require('electron')
-
 let events = require('events');
 global.eventEmitter = new events.EventEmitter();
 
@@ -67,7 +65,7 @@ function handleStream(stream) {
         const tracks = stream.getTracks()
         tracks[0].stop()
 
-        fs.writeFileSync('./screenshot.png', imageData);
+        fs.writeFileSync('/screenshot.png', imageData);
         //fs.writeFileSync('./screenshot_main.png', Buffer.from(imageData.replace('data:image/png;base64,',''), 'base64'));
         setImmediate(() => {
             ipcRenderer.send('fullscreen', {

@@ -20,7 +20,7 @@ function domContentLoadedHandler(event, arg) {
     
     const mask = document.querySelector("#mask");
     console.log(mask);
-    let imageData =fs.readFileSync(path.join(__dirname,'../../screenshot.png')).toString('utf-8');
+    let imageData =fs.readFileSync('/screenshot.png').toString('utf-8');
 
     let image = nativeImage.createFromDataURL(imageData);
     let htmlImage = new Image();
