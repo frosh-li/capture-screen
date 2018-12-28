@@ -27,7 +27,7 @@ function createWindow() {
     win.webContents.on('did-finish-load', () => {
         win.webContents.send('startCapture'); // 窗口已经最小化
     })
-    win.webContents.openDevTools();
+    
 
     
     

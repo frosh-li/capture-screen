@@ -14,6 +14,9 @@ app.on('ready', () => {
     
 
     win = createWindow();
+    if(!app.isPackaged){
+        win.webContents.openDevTools();
+    }
     globalShortcut.register('Esc', () => {
         app.quit();
     });
