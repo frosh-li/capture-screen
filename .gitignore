@@ -1,3 +1,7 @@
 node_modules
 package-lock.json
 screenshot.png
+screenshot_main.png
+yarn-lock.json
+app-win32-x64
+.vscode

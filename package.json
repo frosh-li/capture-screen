@@ -6,15 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron main.js",
-    "package": "asar pack ./ app.asar"
+    "build": "electron-packager . app --asar --platform=win32"
   },
   "keywords": [],
   "author": "8082410@qq.com",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "5.11.0"
-  },
-  "dependencies": {
+    "eslint": "5.11.0",
     "electron": "4.0.0"
   }
 }
