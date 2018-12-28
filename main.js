@@ -18,6 +18,14 @@ app.on('ready', () => {
         app.quit();
     });
 
+    globalShortcut.register('Delete', () => {
+        win.webContents.send('deleteShape');
+    });
+    globalShortcut.register('Backspace', () => {
+        console.log('delete or backend')
+        win.webContents.send('deleteShape');
+    });
+
     ipcMain.on('fullscreen', (event, arg) => {
         if (arg.type === 'setfull') {
             console.log('set full screen');

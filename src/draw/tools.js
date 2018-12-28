@@ -80,6 +80,13 @@ class Toolbar {
                 
             }, false);
         })
+
+        ipcRenderer.on('deleteShape', () => {
+            if(!this.curShape) {
+                return;
+            }
+            this.zr.remove(this.curShape);
+        })
     }
 
     //高亮当前图形按钮
@@ -127,6 +134,9 @@ class Toolbar {
         this.zr.on('mousedown', this.mousedown.bind(this), false);
         this.zr.on('mousemove', this.mousemove.bind(this), false);
         this.zr.on('mouseup', this.mouseup.bind(this), false);
+        this.canvas.addEventListener('keypress', (e) =>{
+            console.log(e)
+        }, false);
     }
 
     mouseup() {
@@ -191,11 +201,12 @@ class Toolbar {
         }
     }
     setEvents(curShape) {
-        curShape.on('mousedown', function() {
+        curShape.on('mousedown', () => {
             dragingShape = true;
+            this.curShape = curShape;
         }).on('mouseup', () => {
             dragingShape = false;
-        });
+        })
     }
     mousemove(e) {
         if(!startToDrawShape || !this.shape) {
