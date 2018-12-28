@@ -60,14 +60,14 @@ function domContentLoadedHandler(event, arg) {
         }
         console.log('mousemove backgrond');
         curPoint = [e.clientX, e.clientY];
-        let width = e.clientX - startPoint[0];
-        let height = e.clientY - startPoint[1];
+        let width = Math.abs(e.clientX - startPoint[0]);
+        let height = Math.abs(e.clientY - startPoint[1]);
         
         canvas.width = width * scaleFactor;
         canvas.height = height * scaleFactor;
         canvas.style.cssText = `
-            left: ${startPoint[0]}px;
-            top: ${startPoint[1]}px;
+            left: ${Math.min(startPoint[0], curPoint[0])}px;
+            top: ${Math.min(startPoint[1], curPoint[1])}px;
             width: ${width}px;
             display:block;
             height: ${height}px;
@@ -76,8 +76,8 @@ function domContentLoadedHandler(event, arg) {
             return;
         }
         let imageData = bgCanvas.getContext('2d').getImageData(
-            startPoint[0] * scaleFactor,
-            startPoint[1] * scaleFactor,
+            Math.min(startPoint[0], curPoint[0]) * scaleFactor,
+            Math.min(startPoint[1], curPoint[1]) * scaleFactor,
             width * scaleFactor,
             height * scaleFactor,
         );
@@ -95,7 +95,10 @@ function domContentLoadedHandler(event, arg) {
         console.log('document mouse up');
         mousedown = false;
         setTimeout(() => {
-            drawTools(curPoint);
+            drawTools([
+                Math.max(curPoint[0], startPoint[0]),
+                Math.max(curPoint[1], startPoint[1]),
+            ]);
         },0)
     }
 

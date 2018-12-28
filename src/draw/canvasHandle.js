@@ -72,8 +72,6 @@ function CanvasMouseup(e) {
     e.preventDefault();
     document.body.style.cursor='default'; 
     mousedown = false;
-    let dis_x = ePoint.x - sPoint.x;
-    let dis_y = ePoint.y - sPoint.y;
     drawTools([
         parseInt(canvas.style.left) + canvasWidth,
         parseInt(canvas.style.top) + canvasHeight,
@@ -81,8 +79,8 @@ function CanvasMouseup(e) {
 }
 
 function dragCanvas() {
-    let dis_x = ePoint.x - sPoint.x;
-    let dis_y = ePoint.y - sPoint.y;
+    let dis_x = (ePoint.x - sPoint.x);
+    let dis_y = (ePoint.y - sPoint.y);
 
     // 边缘检测
 
@@ -102,13 +100,16 @@ function dragCanvas() {
         return;
     }
 
+    if(canvasWidth === 0 || canvasHeight === 0) {
+        return;
+    }
 
     canvas.style.cssText = `
         left: ${pos.left + dis_x}px; 
         top: ${pos.top + dis_y}px; 
         display: block;
         width: ${canvasWidth}px;
-        height: ${canvasHeight};
+        height: ${canvasHeight}px;
     `;
 
     let imageData = bgCanvas.getContext('2d').getImageData(
