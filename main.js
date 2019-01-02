@@ -6,13 +6,14 @@
 
 const { app, globalShortcut, ipcMain } = require('electron');
 
+const os = require('os');
+const platform = os.platform();
+
 const createWindow = require('./src/createWindow');
 
 let win;
 
 app.on('ready', () => {
-    
-
     win = createWindow();
     if(!app.isPackaged){
         win.webContents.openDevTools();
@@ -25,16 +26,20 @@ app.on('ready', () => {
         win.webContents.send('deleteShape');
     });
     globalShortcut.register('Backspace', () => {
-        console.log('delete or backend')
+        console.log('delete or backend');
         win.webContents.send('deleteShape');
     });
 
     ipcMain.on('fullscreen', (event, arg) => {
         if (arg.type === 'setfull') {
             console.log('set full screen');
+            
             win.setFullScreen(true);
+            if(platform !== 'win32') {
+                win.maximize();
+            }
             win.show();
-            event.sender.send('handleEvent', arg)
+            event.sender.send('handleEvent', arg);
             // win.webContents.send('handleEvent'); // 窗口已经最小化
         }
 
