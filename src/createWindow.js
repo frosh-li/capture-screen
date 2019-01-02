@@ -1,37 +1,34 @@
-const { BrowserWindow, ipcMain } = electron = require('electron');
-const path = require('path');
+const { BrowserWindow, ipcMain } = (electron = require("electron"));
+const path = require("path");
 function createWindow() {
-    const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
-    let win = new BrowserWindow({ 
-        width: width, 
-        height: height, 
-        frame: false, 
-        transparent: false,
-        alwaysOnTop: true,
-        show: false,
-        fullscreen: false,
-        resizable: false,
-        maximize: false,
-        maximizable: false,
-        enableLargerThanScreen: true,
-        minimizable: false,
-        modal: true,
-    })
-    
-    win.on('closed', () => {
-        win = null
-    })
+  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
+  let win = new BrowserWindow({
+    width: width,
+    height: height,
+    frame: false,
+    transparent: false,
+    alwaysOnTop: true,
+    show: false,
+    fullscreen: false,
+    resizable: false,
+    maximize: false,
+    maximizable: false,
+    enableLargerThanScreen: true,
+    minimizable: false,
+    modal: true
+  });
 
-    // 或加载本地HTML文件
-    win.loadFile(path.join(__dirname,'assets/index.html'));
-    win.webContents.on('did-finish-load', () => {
-        win.webContents.send('startCapture'); // 窗口已经最小化
-    })
-    
+  win.on("closed", () => {
+    win = null;
+  });
 
-    
-    
-    return win;
+  // 或加载本地HTML文件
+  win.loadFile(path.join(__dirname, "assets/index.html"));
+  win.webContents.on("did-finish-load", () => {
+    win.webContents.send("startCapture"); // 窗口已经最小化
+  });
+
+  return win;
 }
 
 module.exports = createWindow;
