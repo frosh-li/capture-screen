@@ -6,11 +6,18 @@ module.exports = {
     hideTools,
 };
 
+
+const remote = require('electron').remote;
+let curWindow = remote.getCurrentWindow();
+let bounds = curWindow.getBounds();
+let curDisplay = require('electron').screen.getDisplayMatching(bounds);
+console.log(curDisplay);
+console.log('current window', curWindow);
+const scaleFactor = curDisplay.scaleFactor;
 const {
     width: screenWidth,
     height: screenHeight,
-} = require('electron').screen.getPrimaryDisplay().bounds;
-const scaleFactor = require('electron').screen.getPrimaryDisplay().scaleFactor;
+} = bounds;
 let canvas = document.querySelector('#js-canvas');
 let bgCanvas = document.querySelector('#bg-canvas');
 

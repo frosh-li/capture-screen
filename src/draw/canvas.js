@@ -1,8 +1,4 @@
-const nativeImage = require('electron').nativeImage;
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const platform = os.platform();
+const clipboard = require('electron').clipboard;
 const {
     CanvasMousedown,
     CanvasMouseup,
@@ -33,12 +29,14 @@ function domContentLoadedHandler(_, arg) {
     const mask = document.querySelector('#mask');
     console.log(mask);
     let imageData;
-    if (platform === 'win32') {
-        imageData = fs.readFileSync(`/screenshot${curDisplay.id}.png`).toString('utf-8');
-    } else {
-        imageData = fs.readFileSync(path.join(__dirname,`../../screenshot${curDisplay.id}.png`)).toString('utf-8');
-    }
-    let image = nativeImage.createFromDataURL(imageData);
+    // if (platform === 'win32') {
+    //     imageData = fs.readFileSync(`/screenshot${curDisplay.id}.png`).toString('utf-8');
+    // } else {
+    //     imageData = fs.readFileSync(path.join(__dirname,`../../screenshot${curDisplay.id}.png`)).toString('utf-8');
+    // }
+    // imageData = clipboard.readImage(curDisplay.id);
+    // let image = nativeImage.createFromDataURL(imageData);
+    let image = clipboard.readImage(curDisplay.id);
     let htmlImage = new Image();
     htmlImage.src = image.toDataURL();
     htmlImage.onload = htmlImage.complete = function() {

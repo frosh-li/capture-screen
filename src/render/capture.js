@@ -1,6 +1,6 @@
 // In the renderer process.
 console.log('preload');
-const { desktopCapturer, ipcRenderer, remote } = require('electron');
+const { desktopCapturer, ipcRenderer, remote, clipboard, nativeImage } = require('electron');
 let events = require('events');
 global.eventEmitter = new events.EventEmitter();
 const os = require('os');
@@ -71,11 +71,13 @@ function handleStream(stream) {
 
         const tracks = stream.getTracks();
         tracks[0].stop();
-        if (platform === 'win32') {
-            fs.writeFileSync(`/screenshot${curDisplay.id}.png`, imageData);
-        } else {
-            fs.writeFileSync(path.join(__dirname,`../../screenshot${curDisplay.id}.png`), imageData);
-        }
+        clipboard.writeImage(nativeImage.createFromDataURL(imageData), curDisplay.id);
+        // if (platform === 'win32') {
+        //     fs.writeFileSync(`/screenshot${curDisplay.id}.png`, imageData);
+            
+        // } else {
+        //     fs.writeFileSync(path.join(__dirname,`../../screenshot${curDisplay.id}.png`), imageData);
+        // }
 
         setImmediate(() => {
             
