@@ -10,7 +10,14 @@ const {
     drawTools,
     hideTools,
 } = require('./canvasHandle');
-const scaleFactor = require('electron').screen.getPrimaryDisplay().scaleFactor;
+
+const remote = require('electron').remote;
+let curWindow = remote.getCurrentWindow();
+let bounds = curWindow.getBounds();
+let curDisplay = require('electron').screen.getDisplayMatching(bounds);
+console.log(curDisplay);
+console.log('current window', curWindow);
+const scaleFactor = curDisplay.scaleFactor;
 
 function domContentLoadedHandler(_, arg) {
     console.log('lets go, dom content loaded', arg);
@@ -27,9 +34,9 @@ function domContentLoadedHandler(_, arg) {
     console.log(mask);
     let imageData;
     if (platform === 'win32') {
-        imageData = fs.readFileSync('/screenshot.png').toString('utf-8');
+        imageData = fs.readFileSync(`/screenshot${curDisplay.id}.png`).toString('utf-8');
     } else {
-        imageData = fs.readFileSync(path.join(__dirname,'../../screenshot.png')).toString('utf-8');
+        imageData = fs.readFileSync(path.join(__dirname,`../../screenshot${curDisplay.id}.png`)).toString('utf-8');
     }
     let image = nativeImage.createFromDataURL(imageData);
     let htmlImage = new Image();

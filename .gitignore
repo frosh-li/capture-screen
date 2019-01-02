@@ -6,3 +6,4 @@ yarn-lock.json
 app-win32-x64
 .vscode
 yarn.lock
+screenshot*

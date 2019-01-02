@@ -1,6 +1,6 @@
 // In the renderer process.
 console.log('preload');
-const { desktopCapturer, screen, ipcRenderer } = require('electron');
+const { desktopCapturer, ipcRenderer, remote } = require('electron');
 let events = require('events');
 global.eventEmitter = new events.EventEmitter();
 const os = require('os');
@@ -9,17 +9,25 @@ const path = require('path');
 
 const domContentLoadedHandler = require('../draw/canvas');
 const fs = require('fs');
-console.log('屏幕缩放比', screen.getPrimaryDisplay().scaleFactor);
-
+let curWindow = remote.getCurrentWindow();
+let bounds = curWindow.getBounds();
+let curDisplay = require('electron').screen.getDisplayMatching(bounds);
+console.log(curDisplay);
+console.log('current window', curWindow);
 function startCapture() {
     desktopCapturer.getSources(
         {
             types: ['screen'],
         },
         (error, sources) => {
+            console.log(sources);
             if (error) throw error;
-            let curSource = sources[0];
+            let curSource = sources.filter(item => {
+                return item.display_id == curDisplay.id;
+            })[0];
 
+            console.log(curSource);
+            
             navigator.mediaDevices
                 .getUserMedia({
                     audio: false,
@@ -64,17 +72,29 @@ function handleStream(stream) {
         const tracks = stream.getTracks();
         tracks[0].stop();
         if (platform === 'win32') {
-            fs.writeFileSync('/screenshot.png', imageData);
+            fs.writeFileSync(`/screenshot${curDisplay.id}.png`, imageData);
         } else {
-            fs.writeFileSync(path.join(__dirname,'../../screenshot.png'), imageData);
+            fs.writeFileSync(path.join(__dirname,`../../screenshot${curDisplay.id}.png`), imageData);
         }
-        
-        //fs.writeFileSync('./screenshot_main.png', Buffer.from(imageData.replace('data:image/png;base64,',''), 'base64'));
+
         setImmediate(() => {
+            
+            curWindow.setFullScreen(true);
+            if(platform !== 'win32') {
+                curWindow.maximize();
+            }
+            curWindow.show();
+            curWindow.setBounds({
+                width: bounds.width,
+                height: bounds.height,
+                x: bounds.x,
+                y: bounds.y,
+            });
             ipcRenderer.send('fullscreen', {
                 type: 'setfull',
                 width: canvas.width,
                 height: canvas.height,
+                win: curWindow,
             }); // 通知最大化窗口
         });
     };

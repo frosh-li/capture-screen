@@ -6,6 +6,8 @@ const path = require('path');
 function createWindow() {
     const { width, height } = electron.screen.getPrimaryDisplay().bounds;
     let win = new BrowserWindow({
+        x: 0,
+        y: 0,
         width: width,
         height: height,
         frame: false,
@@ -35,4 +37,45 @@ function createWindow() {
     return win;
 }
 
-module.exports = createWindow;
+function createExternalWindow() {
+    // 在外部显示器中创建一个窗口
+    let displays = electron.screen.getAllDisplays();
+    let externalDisplay = displays.find((display) => {
+        return display.bounds.x !== 0 || display.bounds.y !== 0;
+    });
+
+    if (externalDisplay) {
+        let ewin = new BrowserWindow({
+            x: externalDisplay.bounds.x,
+            y: externalDisplay.bounds.y,
+            width: externalDisplay.bounds.width,
+            height: externalDisplay.bounds.height,
+            frame: false,
+            transparent: false,
+            alwaysOnTop: true,
+            show: false,
+            fullscreen: false,
+            resizable: false,
+            maximize: false,
+            maximizable: false,
+            enableLargerThanScreen: true,
+            minimizable: false,
+            modal: platform !== 'win32' ? false : true,
+            kiosk: platform === 'win32' ? false : true,
+        });
+        console.log(ewin);
+        ewin.loadFile(path.join(__dirname, 'assets/index.html'));
+        ewin.on('closed', () => {
+            ewin = null;
+        });
+        ewin.webContents.on('did-finish-load', () => {
+            ewin.webContents.send('startCapture'); // 窗口已经最小化
+        });
+        return ewin;
+    }
+}
+
+module.exports = {
+    createWindow: createWindow,
+    createExternalWindow: createExternalWindow,
+};

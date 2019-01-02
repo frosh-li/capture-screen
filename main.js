@@ -9,14 +9,15 @@ const { app, globalShortcut, ipcMain } = require('electron');
 const os = require('os');
 const platform = os.platform();
 
-const createWindow = require('./src/createWindow');
+const { createWindow, createExternalWindow } = require('./src/createWindow');
 
 let win;
+let ewin;
 
 app.on('ready', () => {
     win = createWindow();
     if(!app.isPackaged){
-        win.webContents.openDevTools();
+        win && win.webContents.openDevTools();
     }
     globalShortcut.register('Esc', () => {
         app.quit();
@@ -30,28 +31,29 @@ app.on('ready', () => {
         win.webContents.send('deleteShape');
     });
 
+    let displays = require('electron').screen.getAllDisplays();
+    let externalDisplay = displays.find((display) => {
+        return display.bounds.x !== 0 || display.bounds.y !== 0;
+    });
+    if (externalDisplay) {
+        ewin = createExternalWindow();
+        if(!app.isPackaged){
+            ewin && ewin.webContents.openDevTools();
+        }
+    }
+
     ipcMain.on('fullscreen', (event, arg) => {
         if (arg.type === 'setfull') {
-            console.log('set full screen');
-            
-            win.setFullScreen(true);
-            if(platform !== 'win32') {
-                win.maximize();
-            }
-            win.show();
+            console.log('set full screen', event);
             event.sender.send('handleEvent', arg);
-            // win.webContents.send('handleEvent'); // 窗口已经最小化
-        }
-
-        if (arg.type === 'setmin') {
-            win.minimize();
         }
     });
 
     ipcMain.on('closeapp', () => {
         win.close();
+        ewin && ewin.close();
         app.quit();
-    })
+    });
     
 });
 
@@ -63,4 +65,8 @@ app.on('activate', () => {
     if (win === null) {
         win = createWindow();
     }
-})
+
+    if (ewin === null) {
+        ewin = createExternalWindow();
+    }
+});
