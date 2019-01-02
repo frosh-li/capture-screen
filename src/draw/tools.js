@@ -1,6 +1,11 @@
 const { remote, ipcRenderer, clipboard, nativeImage } = require('electron');
 const fs = require('fs');
-const scaleFactor = require('electron').screen.getPrimaryDisplay().scaleFactor;
+let curWindow = remote.getCurrentWindow();
+let bounds = curWindow.getBounds();
+let curDisplay = require('electron').screen.getDisplayMatching(bounds);
+console.log(curDisplay);
+console.log('current window', curWindow);
+const scaleFactor = curDisplay.scaleFactor;
 let canBeDrawShape = false;
 let startToDrawShape = false;
 let dragingShape = false;
