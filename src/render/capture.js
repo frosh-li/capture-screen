@@ -5,15 +5,20 @@ let events = require('events');
 global.eventEmitter = new events.EventEmitter();
 const os = require('os');
 const platform = os.platform();
-const path = require('path');
-
+let displayIndex = 0;
 const domContentLoadedHandler = require('../draw/canvas');
-const fs = require('fs');
 let curWindow = remote.getCurrentWindow();
 let bounds = curWindow.getBounds();
 let curDisplay = require('electron').screen.getDisplayMatching(bounds);
-console.log(curDisplay);
+console.log('curDisplay', curDisplay);
 console.log('current window', curWindow);
+let allDisplay = require('electron').screen.getAllDisplays();
+allDisplay.forEach( (dis, i) => {
+    if(dis == curDisplay) {
+        displayIndex = i;
+    }
+});
+
 function startCapture() {
     desktopCapturer.getSources(
         {
@@ -22,9 +27,7 @@ function startCapture() {
         (error, sources) => {
             console.log(sources);
             if (error) throw error;
-            let curSource = sources.filter(item => {
-                return item.display_id == curDisplay.id;
-            })[0];
+            let curSource = sources[displayIndex];
 
             console.log(curSource);
             
@@ -80,18 +83,17 @@ function handleStream(stream) {
         // }
 
         setImmediate(() => {
-            
             curWindow.setFullScreen(true);
             if(platform !== 'win32') {
                 curWindow.maximize();
+                curWindow.setBounds({
+                    width: bounds.width,
+                    height: bounds.height,
+                    x: bounds.x,
+                    y: bounds.y,
+                });
             }
             curWindow.show();
-            curWindow.setBounds({
-                width: bounds.width,
-                height: bounds.height,
-                x: bounds.x,
-                y: bounds.y,
-            });
             ipcRenderer.send('fullscreen', {
                 type: 'setfull',
                 width: canvas.width,

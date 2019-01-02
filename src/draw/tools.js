@@ -60,8 +60,10 @@ class Toolbar {
         this.btnArrow = document.querySelector('#btn-arrow');
         this.btnPen = document.querySelector('#btn-pen');
         this.btnDownload = document.querySelector('#btn-download');
+        this.btnText = document.querySelector('#btn-text');
         this.btnOk = document.querySelector('#btn-ok');
         this.canvas = document.querySelector('#js-canvas');
+        this.textInputBox = document.querySelector('#TextInputBox');
         this.audio = new Audio();
         this.audio.src = '../assets/audio/capture.mp3';
         this.btnGroup = [
@@ -72,6 +74,7 @@ class Toolbar {
             'btnPen',
             'btnDownload',
             'btnOk',
+            'btnText',
         ];
 
         this.penColor = 'red';
@@ -184,12 +187,74 @@ class Toolbar {
             x: e.event.layerX * scaleFactor,
             y: e.event.layerY * scaleFactor,
         };
+
+        if (this.shape === 'text') {
+            this.textInputBox.style.cssText = `
+                top: ${e.event.clientY}px;
+                left: ${e.event.clientX}px;
+                display: block;
+                z-index: 1001;
+                background: transparent;
+                color: ${this.penColor};
+            `;
+            this.textInputBox.focus();
+            this.textInputBox.addEventListener('input', () => {
+                console.log(this.textInputBox.value);
+                this.curShape.attr({
+                    style: {
+                        text: this.textInputBox.value,
+                        textOffset: [this.sPoint.x, this.sPoint.y],
+                        textPosition: [this.sPoint.x, this.sPoint.y],
+                    }
+                });
+            }, false);
+            console.log(this.curShape);
+            if (this.curShape && this.curShape.__proto__.type === 'text' && this.curShape.style.text === '') {
+                this.curShape.attr({
+                    rectHover: true,
+                    draggable: true,
+                    cursor: 'move',
+                    style: {
+                        textPosition: [this.sPoint.x, this.sPoint.y],
+                    }
+                });
+                return;
+            }
+            this.curShape = new zrender.Text({
+                rectHover: true,
+                draggable: true,
+                cursor: 'move',
+                style: {
+                    textFill: this.penColor,
+                    textStroke: this.penColor,
+                    lineWidth: 2,
+                    fontFamily: '微软雅黑',
+                    fontSize: '16',
+                    textWidth: '100',
+                    textLineHeight: '30',
+                    textBorderColor: this.penColor,
+                    textBorderWidth: 2,
+                    text: '',
+                    textPosition: [this.sPoint.x, this.sPoint.y],
+                    textRect: {
+                        x: this.sPoint.x - 10,
+                        y: this.sPoint.y - 10,
+                        width: 100,
+                        height: 30,
+                    }
+                }
+            });
+            this.setEvents(this.curShape);
+            this.zr.add(this.curShape);
+        }
+
         if (this.shape === 'circle') {
-            this.curShape = new zrender.Circle({
+            this.curShape = new zrender.Ellipse({
                 shape: {
                     cx: -1000,
                     cy: -1000,
-                    r: 1,
+                    rx: 1,
+                    ry: 1,
                 },
             });
             this.setEvents(this.curShape);
@@ -247,7 +312,6 @@ class Toolbar {
         if (!startToDrawShape || !this.shape) {
             return;
         }
-        console.log(e);
         this.ePoint = {
             x: e.event.layerX * scaleFactor,
             y: e.event.layerY * scaleFactor,
@@ -275,7 +339,8 @@ class Toolbar {
                 shape: {
                     cx: (this.sPoint.x + this.ePoint.x) / 2,
                     cy: (this.sPoint.y + this.ePoint.y) / 2,
-                    r: Math.abs(this.sPoint.x - this.ePoint.x) / 2,
+                    rx: Math.abs(this.sPoint.x - this.ePoint.x) / 2,
+                    ry: Math.abs(this.sPoint.y - this.ePoint.y) / 2,
                 },
                 style: {
                     fill: 'none',
@@ -321,6 +386,21 @@ class Toolbar {
                 cursor: 'move',
             });
         }
+
+        if (this.shape === 'text') {
+            this.curShape.attr({
+                rectHover: true,
+                draggable: true,
+                cursor: 'move',
+                style: {
+                    textPosition: [this.ePoint.x, this.ePoint.y],
+                }
+            });
+        }
+    }
+
+    btnTextClickHandle() {
+        this.shape = 'text';
     }
 
     btnCircleClickHandle() {

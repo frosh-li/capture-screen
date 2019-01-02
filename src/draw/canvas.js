@@ -113,6 +113,14 @@ function domContentLoadedHandler(_, arg) {
     function endDrawCanvas(e) {
         console.log('document mouse up');
         mousedown = false;
+        if (Math.abs(curPoint[0] - startPoint[0]) > 0
+            &&
+            Math.abs(curPoint[0] - startPoint[0]) > 0) {
+            document.removeEventListener('mousedown', readyDrawCanvas, false);
+            document.removeEventListener('mousemove', startDrawCanvas, false);
+            document.removeEventListener('mouseup', endDrawCanvas, false);
+        }
+        
         setTimeout(() => {
             drawTools([
                 Math.max(curPoint[0], startPoint[0]),
@@ -126,10 +134,6 @@ function domContentLoadedHandler(_, arg) {
 
     eventEmitter.on('startDrawInCanvas', () => {
         console.log('handle event');
-        document.removeEventListener('mousedown', readyDrawCanvas, false);
-        document.removeEventListener('mousemove', startDrawCanvas, false);
-        document.removeEventListener('mouseup', endDrawCanvas, false);
-
         canvas.removeEventListener('mousedown', CanvasMousedown, false);
         canvas.removeEventListener('mousemove', CanvasMousemove, false);
         canvas.removeEventListener('mouseup', CanvasMouseup, false);

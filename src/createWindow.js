@@ -4,12 +4,10 @@ const os = require('os');
 const platform = os.platform();
 const path = require('path');
 function createWindow() {
-    const { width, height } = electron.screen.getPrimaryDisplay().bounds;
+    const bounds = electron.screen.getPrimaryDisplay().bounds;
+    console.log('main win', bounds);
     let win = new BrowserWindow({
-        x: 0,
-        y: 0,
-        width: width,
-        height: height,
+        // ...bounds,
         frame: false,
         transparent: false,
         alwaysOnTop: true,
@@ -21,7 +19,7 @@ function createWindow() {
         enableLargerThanScreen: true,
         minimizable: false,
         modal: platform !== 'win32' ? false : true,
-        kiosk: platform === 'win32' ? false : true,
+        kiosk: platform === 'win32' ? undefined : true,
     });
 
     win.on('closed', () => {

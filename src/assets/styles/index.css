@@ -45,12 +45,21 @@ html, body {
     padding: 5px 10px;
     border-radius: 4px;
     font-family: Arial Consolas sans-serif;
-    display: none;
+    display: -webkit-flex;
+    visibility:hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
     z-index: 100;
     align-items: center;
     height: 40px;
     line-height: 40px;
+}
+
+#TextInputBox {
+    position: absolute;
+    border: 1px solid red;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
 }
 
 .toolbar .iconfont {

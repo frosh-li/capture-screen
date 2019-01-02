@@ -147,13 +147,15 @@ function dragCanvas() {
  */
 function drawTools(curPoint) {
     let tools = document.querySelector('#js-toolbar');
-    tools.style.display = '-webkit-flex';
+    
     let width = tools.offsetWidth;
     tools.style.left = curPoint[0] - parseInt(width) + 'px';
     tools.style.top = curPoint[1] + 'px';
+    tools.style.visibility = 'visible';
+    
 }
 
 function hideTools() {
     let tools = document.querySelector('#js-toolbar');
-    tools.style.display = 'none';
+    tools.style.visibility = 'hidden';
 }
