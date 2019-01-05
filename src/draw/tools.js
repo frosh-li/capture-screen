@@ -102,10 +102,9 @@ class Toolbar {
         });
 
         ipcRenderer.on('deleteShape', () => {
-            if (!this.curShape) {
-                return;
+            if (this.curShape) {
+                this.zr.remove(this.curShape);    
             }
-            this.zr.remove(this.curShape);
         });
     }
 
@@ -189,36 +188,50 @@ class Toolbar {
         };
 
         if (this.shape === 'text') {
-            this.textInputBox.style.cssText = `
-                top: ${e.event.clientY}px;
-                left: ${e.event.clientX}px;
-                display: block;
-                z-index: 1001;
-                background: transparent;
-                color: ${this.penColor};
-            `;
-            this.textInputBox.focus();
+            // this.textInputBox.style.cssText = `
+            //     top: ${e.event.clientY - 15}px;
+            //     left: ${e.event.clientX - 15}px;
+            //     display: block;
+            //     background: transparent;
+            //     color: ${this.penColor};
+            //     z-index: 5;
+            // `;
+            setTimeout(() => {
+                this.textInputBox.focus();
+            },0);
             this.textInputBox.addEventListener('input', () => {
                 console.log(this.textInputBox.value);
+                let sx = this.sPoint.x - 15 * scaleFactor;
+                let sy = this.sPoint.y - 15 * scaleFactor;
+                if ( sx <= 0) {
+                    sx = 0;
+                }
+                if (sy <= 0) {
+                    sy = 0;
+                }
+                let bounds = this.curShape.getBoundingRect();
+                if (bounds.x + bounds.width >= this.canvas.width - 10) {
+                    this.textInputBox.value += '\n';
+                }
                 this.curShape.attr({
                     style: {
-                        text: this.textInputBox.value,
-                        textOffset: [this.sPoint.x, this.sPoint.y],
-                        textPosition: [this.sPoint.x, this.sPoint.y],
-                    }
+                        text: this.textInputBox.value === '' ? ' ': this.textInputBox.value,
+                    },
+                    position: [sx, sy],
                 });
             }, false);
+            
             console.log(this.curShape);
             if (this.curShape && this.curShape.__proto__.type === 'text' && this.curShape.style.text === '') {
-                this.curShape.attr({
-                    rectHover: true,
-                    draggable: true,
-                    cursor: 'move',
-                    style: {
-                        textPosition: [this.sPoint.x, this.sPoint.y],
-                    }
-                });
-                return;
+                this.zr.remove(this.curShape);
+            }
+            let sx = this.sPoint.x - 15 * scaleFactor;
+            let sy = this.sPoint.y - 15 * scaleFactor;
+            if ( sx <= 0) {
+                sx = 0;
+            }
+            if (sy <= 0) {
+                sy = 0;
             }
             this.curShape = new zrender.Text({
                 rectHover: true,
@@ -229,23 +242,20 @@ class Toolbar {
                     textStroke: this.penColor,
                     lineWidth: 2,
                     fontFamily: '微软雅黑',
-                    fontSize: '16',
+                    fontSize: 18 * scaleFactor,
+                    textPadding: 7 * scaleFactor,
                     textWidth: '100',
-                    textLineHeight: '30',
+                    textLineHeight: 30 * scaleFactor,
                     textBorderColor: this.penColor,
                     textBorderWidth: 2,
-                    text: '',
-                    textPosition: [this.sPoint.x, this.sPoint.y],
-                    textRect: {
-                        x: this.sPoint.x - 10,
-                        y: this.sPoint.y - 10,
-                        width: 100,
-                        height: 30,
-                    }
-                }
+                    text: ' ',
+                },
+                position: [sx, sy],
             });
+            // pt = px * dpi / 72
             this.setEvents(this.curShape);
             this.zr.add(this.curShape);
+            this.textInputBox.focus();
         }
 
         if (this.shape === 'circle') {

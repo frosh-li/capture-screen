@@ -57,9 +57,14 @@ html, body {
 #TextInputBox {
     position: absolute;
     border: 1px solid red;
-    width: 100px;
     height: 30px;
     line-height: 30px;
+    font-size: 18px;
+    font-family: '微软雅黑';
+    left: -9999px;
+    top: -9999px;
+    vertical-align: middle;
+    outline: none;
 }
 
 .toolbar .iconfont {

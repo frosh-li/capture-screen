@@ -53,6 +53,18 @@ function domContentLoadedHandler(_, arg) {
     canvas.addEventListener('mousemove', CanvasMousemove, false);
     canvas.addEventListener('mouseup', CanvasMouseup, false);
 
+    // document.getElementById('TextInputBox').addEventListener('input', () => {
+    //     let txt= document.getElementById('TextInputBox');
+    //     if (txt.value === '') {
+    //         txt.value = ' ';
+    //     }
+    // }, false);
+
+    document.getElementById('TextInputBox').addEventListener('blur', () => {
+        let txt= document.getElementById('TextInputBox');
+        txt.value = ' ';
+    }, false);
+
     function readyDrawCanvas(e) {
         console.log('mousedown backgrond');
         mousedown = true;

@@ -23,13 +23,13 @@ app.on('ready', () => {
         app.quit();
     });
 
-    globalShortcut.register('Delete', () => {
-        win.webContents.send('deleteShape');
-    });
-    globalShortcut.register('Backspace', () => {
-        console.log('delete or backend');
-        win.webContents.send('deleteShape');
-    });
+    // globalShortcut.register('Delete', () => {
+    //     win.webContents.send('deleteShape');
+    // });
+    // globalShortcut.register('Backspace', () => {
+    //     console.log('delete or backend');
+    //     win.webContents.send('deleteShape');
+    // });
 
     let displays = require('electron').screen.getAllDisplays();
     let externalDisplay = displays.find((display) => {
