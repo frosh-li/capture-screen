@@ -13,8 +13,9 @@ let curDisplay = require('electron').screen.getDisplayMatching(bounds);
 console.log('curDisplay', curDisplay);
 console.log('current window', curWindow);
 let allDisplay = require('electron').screen.getAllDisplays();
+console.log('all Display', allDisplay);
 allDisplay.forEach( (dis, i) => {
-    if(dis == curDisplay) {
+    if(dis.id == curDisplay.id) {
         displayIndex = i;
     }
 });
@@ -25,7 +26,7 @@ function startCapture() {
             types: ['screen'],
         },
         (error, sources) => {
-            console.log(sources);
+            console.log('all source', sources, 'displayIndex', displayIndex);
             if (error) throw error;
             let curSource = sources[displayIndex];
 
@@ -83,16 +84,9 @@ function handleStream(stream) {
         // }
 
         setImmediate(() => {
+            // curWindow.maximize();
+            // curWindow.getNativeWindowHandle().
             curWindow.setFullScreen(true);
-            if(platform !== 'win32') {
-                curWindow.maximize();
-                curWindow.setBounds({
-                    width: bounds.width,
-                    height: bounds.height,
-                    x: bounds.x,
-                    y: bounds.y,
-                });
-            }
             curWindow.show();
             ipcRenderer.send('fullscreen', {
                 type: 'setfull',

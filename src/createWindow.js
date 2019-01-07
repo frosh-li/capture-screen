@@ -8,6 +8,8 @@ function createWindow() {
     console.log('main win', bounds);
     let win = new BrowserWindow({
         // ...bounds,
+        // width: bounds.width,
+        // height: bounds.height,
         frame: false,
         transparent: false,
         alwaysOnTop: true,
@@ -43,6 +45,7 @@ function createExternalWindow() {
     });
 
     if (externalDisplay) {
+        console.log('externalDisplay', externalDisplay);
         let ewin = new BrowserWindow({
             x: externalDisplay.bounds.x,
             y: externalDisplay.bounds.y,
@@ -53,13 +56,13 @@ function createExternalWindow() {
             alwaysOnTop: true,
             show: false,
             fullscreen: false,
-            resizable: false,
+            resizable: true,
             maximize: false,
             maximizable: false,
             enableLargerThanScreen: true,
             minimizable: false,
             modal: platform !== 'win32' ? false : true,
-            kiosk: platform === 'win32' ? false : true,
+            kiosk: platform === 'win32' ? undefined : true,
         });
         console.log(ewin);
         ewin.loadFile(path.join(__dirname, 'assets/index.html'));
