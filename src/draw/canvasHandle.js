@@ -14,13 +14,14 @@ let curDisplay = require('electron').screen.getDisplayMatching(bounds);
 console.log(curDisplay);
 console.log('current window', curWindow);
 const scaleFactor = curDisplay.scaleFactor;
-const {
-    width: screenWidth,
-    height: screenHeight,
-} = bounds;
+// const {
+//     outerWidth: screenWidth,
+//     outerHeight: screenHeight,
+// } = window;
 let canvas = document.querySelector('#js-canvas');
 let bgCanvas = document.querySelector('#bg-canvas');
-
+let screenWidth = bgCanvas.style.width;
+let screenHeight = bgCanvas.style.height;
 let pos = {
     left: canvas.style.left,
     top: canvas.style.top,
@@ -58,6 +59,10 @@ function CanvasMousedown(e) {
 
     canvasWidth = parseInt(canvas.style.width);
     canvasHeight = parseInt(canvas.style.height);
+
+    screenWidth = parseInt(bgCanvas.width);
+    screenHeight = parseInt(bgCanvas.height);
+    console.log(screenWidth, screenHeight);
     hideTools();
 }
 
@@ -93,26 +98,26 @@ function dragCanvas() {
 
     // 边缘检测
 
-    if (pos.left + dis_x <= 0) {
-        return;
+    if (pos.left + dis_x  <= 0) {
+        dis_x = -pos.left;
     }
 
-    if (pos.top + dis_y <= 0) {
-        return;
+    if (pos.top  + dis_y  <= 0) {
+        dis_y = -pos.top;
     }
 
-    if (pos.top + dis_y + canvasHeight >= screenHeight) {
-        return;
+    if (pos.top  + dis_y  + canvasHeight >= screenHeight) {
+        dis_y = screenHeight - canvasHeight - pos.top;
     }
 
-    if (pos.left + dis_x + canvasWidth >= screenWidth) {
-        return;
+    if (pos.left + dis_x  + canvasWidth >= screenWidth) {
+        dis_x = screenWidth - canvasWidth - pos.left;
     }
 
     if (canvasWidth === 0 || canvasHeight === 0) {
         return;
     }
-
+    console.log(pos.left + dis_x, pos.top + dis_y, screenWidth, scaleFactor);
     canvas.style.cssText = `
         left: ${pos.left + dis_x}px; 
         top: ${pos.top + dis_y}px; 

@@ -188,14 +188,7 @@ class Toolbar {
         };
 
         if (this.shape === 'text') {
-            // this.textInputBox.style.cssText = `
-            //     top: ${e.event.clientY - 15}px;
-            //     left: ${e.event.clientX - 15}px;
-            //     display: block;
-            //     background: transparent;
-            //     color: ${this.penColor};
-            //     z-index: 5;
-            // `;
+
             setTimeout(() => {
                 this.textInputBox.focus();
             },0);
