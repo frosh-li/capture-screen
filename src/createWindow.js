@@ -8,8 +8,8 @@ function createWindow() {
     console.log('main win', bounds);
     let win = new BrowserWindow({
         // ...bounds,
-        // width: bounds.width,
-        // height: bounds.height,
+        width: bounds.width,
+        height: bounds.height,
         frame: false,
         transparent: false,
         alwaysOnTop: true,
