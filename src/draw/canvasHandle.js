@@ -6,13 +6,11 @@ module.exports = {
     hideTools,
 };
 
-
 const remote = require('electron').remote;
 let curWindow = remote.getCurrentWindow();
 let bounds = curWindow.getBounds();
 let curDisplay = require('electron').screen.getDisplayMatching(bounds);
-console.log(curDisplay);
-console.log('current window', curWindow);
+
 const scaleFactor = curDisplay.scaleFactor;
 // const {
 //     outerWidth: screenWidth,
@@ -45,7 +43,7 @@ function CanvasMousedown(e) {
     e.preventDefault();
     e.stopPropagation();
     document.body.style.cursor = 'move';
-    console.log(e);
+
     mousedown = true;
     sPoint = {
         x: e.clientX,
@@ -62,7 +60,7 @@ function CanvasMousedown(e) {
 
     screenWidth = parseInt(bgCanvas.width);
     screenHeight = parseInt(bgCanvas.height);
-    console.log(screenWidth, screenHeight);
+
     hideTools();
 }
 
@@ -98,26 +96,26 @@ function dragCanvas() {
 
     // 边缘检测
 
-    if (pos.left + dis_x  <= 0) {
+    if (pos.left + dis_x <= 0) {
         dis_x = -pos.left;
     }
 
-    if (pos.top  + dis_y  <= 0) {
+    if (pos.top + dis_y <= 0) {
         dis_y = -pos.top;
     }
 
-    if (pos.top  + dis_y  + canvasHeight >= screenHeight) {
+    if (pos.top + dis_y + canvasHeight >= screenHeight) {
         dis_y = screenHeight - canvasHeight - pos.top;
     }
 
-    if (pos.left + dis_x  + canvasWidth >= screenWidth) {
+    if (pos.left + dis_x + canvasWidth >= screenWidth) {
         dis_x = screenWidth - canvasWidth - pos.left;
     }
 
     if (canvasWidth === 0 || canvasHeight === 0) {
         return;
     }
-    console.log(pos.left + dis_x, pos.top + dis_y, screenWidth, scaleFactor);
+
     canvas.style.cssText = `
         left: ${pos.left + dis_x}px; 
         top: ${pos.top + dis_y}px; 
@@ -152,12 +150,11 @@ function dragCanvas() {
  */
 function drawTools(curPoint) {
     let tools = document.querySelector('#js-toolbar');
-    
+
     let width = tools.offsetWidth;
     tools.style.left = curPoint[0] - parseInt(width) + 'px';
     tools.style.top = curPoint[1] + 'px';
     tools.style.visibility = 'visible';
-    
 }
 
 function hideTools() {

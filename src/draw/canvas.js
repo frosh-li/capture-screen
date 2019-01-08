@@ -11,12 +11,10 @@ const remote = require('electron').remote;
 let curWindow = remote.getCurrentWindow();
 let bounds = curWindow.getBounds();
 let curDisplay = require('electron').screen.getDisplayMatching(bounds);
-console.log(curDisplay);
-console.log('current window', curWindow);
+
 const scaleFactor = curDisplay.scaleFactor;
 
 function domContentLoadedHandler(_, arg) {
-    console.log('lets go, dom content loaded', arg);
     let mousedown = false;
     let startPoint = [0, 0];
     let curPoint = [0, 0];
@@ -27,7 +25,7 @@ function domContentLoadedHandler(_, arg) {
     bgCanvas.height = arg.height;
 
     const mask = document.querySelector('#mask');
-    console.log(mask);
+
     let imageData;
     // if (platform === 'win32') {
     //     imageData = fs.readFileSync(`/screenshot${curDisplay.id}.png`).toString('utf-8');
@@ -43,7 +41,7 @@ function domContentLoadedHandler(_, arg) {
         bgCanvas.getContext('2d').drawImage(htmlImage, 0, 0);
         htmlImage = null;
     };
-    // 
+    //
 
     document.addEventListener('mousedown', readyDrawCanvas, false);
     document.addEventListener('mousemove', startDrawCanvas, false);
@@ -60,13 +58,16 @@ function domContentLoadedHandler(_, arg) {
     //     }
     // }, false);
 
-    document.getElementById('TextInputBox').addEventListener('blur', () => {
-        let txt= document.getElementById('TextInputBox');
-        txt.value = ' ';
-    }, false);
+    document.getElementById('TextInputBox').addEventListener(
+        'blur',
+        () => {
+            let txt = document.getElementById('TextInputBox');
+            txt.value = ' ';
+        },
+        false,
+    );
 
     function readyDrawCanvas(e) {
-        console.log('mousedown backgrond');
         mousedown = true;
         startPoint[0] = e.clientX;
         startPoint[1] = e.clientY;
@@ -84,7 +85,7 @@ function domContentLoadedHandler(_, arg) {
         if (!mousedown) {
             return;
         }
-        console.log('mousemove backgrond');
+
         curPoint = [e.clientX, e.clientY];
         let width = Math.abs(e.clientX - startPoint[0]);
         let height = Math.abs(e.clientY - startPoint[1]);
@@ -123,16 +124,16 @@ function domContentLoadedHandler(_, arg) {
     }
 
     function endDrawCanvas(e) {
-        console.log('document mouse up');
         mousedown = false;
-        if (Math.abs(curPoint[0] - startPoint[0]) > 0
-            &&
-            Math.abs(curPoint[0] - startPoint[0]) > 0) {
+        if (
+            Math.abs(curPoint[0] - startPoint[0]) > 0 &&
+            Math.abs(curPoint[0] - startPoint[0]) > 0
+        ) {
             document.removeEventListener('mousedown', readyDrawCanvas, false);
             document.removeEventListener('mousemove', startDrawCanvas, false);
             document.removeEventListener('mouseup', endDrawCanvas, false);
         }
-        
+
         setTimeout(() => {
             drawTools([
                 Math.max(curPoint[0], startPoint[0]),
@@ -145,7 +146,6 @@ function domContentLoadedHandler(_, arg) {
     new Toolbar().init();
 
     eventEmitter.on('startDrawInCanvas', () => {
-        console.log('handle event');
         canvas.removeEventListener('mousedown', CanvasMousedown, false);
         canvas.removeEventListener('mousemove', CanvasMousemove, false);
         canvas.removeEventListener('mouseup', CanvasMouseup, false);

@@ -1,6 +1,7 @@
 /*! jQuery v3.3.1 | (c) JS Foundation and other contributors | jquery.org/license */
 !(function(e, t) {
     'use strict';
+
     'object' == typeof module && 'object' == typeof module.exports
         ? (module.exports = e.document
               ? t(e, !0)
@@ -14,6 +15,7 @@
         : t(e);
 })('undefined' != typeof window ? window : this, function(e, t) {
     'use strict';
+
     var n = [],
         r = e.document,
         i = Object.getPrototypeOf,

@@ -13,7 +13,11 @@
   "author": "8082410@qq.com",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "electron": "4.0.0",
     "eslint": "5.11.0",
-    "electron": "4.0.0"
+    "prettier": "^1.15.3"
   }
 }

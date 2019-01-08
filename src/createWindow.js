@@ -5,7 +5,7 @@ const platform = os.platform();
 const path = require('path');
 function createWindow() {
     const bounds = electron.screen.getPrimaryDisplay().bounds;
-    console.log('main win', bounds);
+
     let win = new BrowserWindow({
         // ...bounds,
         width: bounds.width,
@@ -40,12 +40,11 @@ function createWindow() {
 function createExternalWindow() {
     // 在外部显示器中创建一个窗口
     let displays = electron.screen.getAllDisplays();
-    let externalDisplay = displays.find((display) => {
+    let externalDisplay = displays.find(display => {
         return display.bounds.x !== 0 || display.bounds.y !== 0;
     });
 
     if (externalDisplay) {
-        console.log('externalDisplay', externalDisplay);
         let ewin = new BrowserWindow({
             x: externalDisplay.bounds.x,
             y: externalDisplay.bounds.y,
@@ -64,7 +63,7 @@ function createExternalWindow() {
             modal: platform !== 'win32' ? false : true,
             kiosk: platform === 'win32' ? undefined : true,
         });
-        console.log(ewin);
+
         ewin.loadFile(path.join(__dirname, 'assets/index.html'));
         ewin.on('closed', () => {
             ewin = null;

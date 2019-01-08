@@ -3,8 +3,7 @@ const fs = require('fs');
 let curWindow = remote.getCurrentWindow();
 let bounds = curWindow.getBounds();
 let curDisplay = require('electron').screen.getDisplayMatching(bounds);
-console.log(curDisplay);
-console.log('current window', curWindow);
+
 const scaleFactor = curDisplay.scaleFactor;
 let canBeDrawShape = false;
 let startToDrawShape = false;
@@ -25,7 +24,7 @@ let ArrowShape = new zrender.Path.extend({
 
         let angle = Math.atan2(y1 - y2, x2 - x1); //弧度  0.6435011087932844
         let theta = angle * (180 / Math.PI); //角度  36.86989764584402
-        console.log('角度', theta);
+
         let dis = Math.sqrt(
             Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2),
         );
@@ -82,7 +81,7 @@ class Toolbar {
     init() {
         this.btnGroup.forEach(btn => {
             let handle = `${btn}ClickHandle`;
-            console.log(handle, this[btn]);
+
             this[btn].addEventListener(
                 'mousedown',
                 e => {
@@ -94,7 +93,7 @@ class Toolbar {
                     }
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('click on ', handle);
+
                     this[handle]();
                 },
                 false,
@@ -103,7 +102,7 @@ class Toolbar {
 
         ipcRenderer.on('deleteShape', () => {
             if (this.curShape) {
-                this.zr.remove(this.curShape);    
+                this.zr.remove(this.curShape);
             }
         });
     }
@@ -113,7 +112,6 @@ class Toolbar {
         // console.log('highlight btn', btn);
         this.btnGroup.forEach(_btn => {
             if (btn === _btn) {
-                console.log('highlight btn', btn, this[btn]);
                 this[_btn].style.color = 'red';
             } else {
                 this[_btn].style.color = '#333';
@@ -165,13 +163,6 @@ class Toolbar {
         this.zr.on('mousedown', this.mousedown.bind(this), false);
         this.zr.on('mousemove', this.mousemove.bind(this), false);
         this.zr.on('mouseup', this.mouseup.bind(this), false);
-        this.canvas.addEventListener(
-            'keypress',
-            e => {
-                console.log(e);
-            },
-            false,
-        );
     }
 
     mouseup() {
@@ -188,39 +179,47 @@ class Toolbar {
         };
 
         if (this.shape === 'text') {
-
             setTimeout(() => {
                 this.textInputBox.focus();
-            },0);
-            this.textInputBox.addEventListener('input', () => {
-                console.log(this.textInputBox.value);
-                let sx = this.sPoint.x - 15 * scaleFactor;
-                let sy = this.sPoint.y - 15 * scaleFactor;
-                if ( sx <= 0) {
-                    sx = 0;
-                }
-                if (sy <= 0) {
-                    sy = 0;
-                }
-                let bounds = this.curShape.getBoundingRect();
-                if (bounds.x + bounds.width >= this.canvas.width - 10) {
-                    this.textInputBox.value += '\n';
-                }
-                this.curShape.attr({
-                    style: {
-                        text: this.textInputBox.value === '' ? ' ': this.textInputBox.value,
-                    },
-                    position: [sx, sy],
-                });
-            }, false);
-            
-            console.log(this.curShape);
-            if (this.curShape && this.curShape.__proto__.type === 'text' && this.curShape.style.text === '') {
+            }, 0);
+            this.textInputBox.addEventListener(
+                'input',
+                () => {
+                    let sx = this.sPoint.x - 15 * scaleFactor;
+                    let sy = this.sPoint.y - 15 * scaleFactor;
+                    if (sx <= 0) {
+                        sx = 0;
+                    }
+                    if (sy <= 0) {
+                        sy = 0;
+                    }
+                    let bounds = this.curShape.getBoundingRect();
+                    if (bounds.x + bounds.width >= this.canvas.width - 10) {
+                        this.textInputBox.value += '\n';
+                    }
+                    this.curShape.attr({
+                        style: {
+                            text:
+                                this.textInputBox.value === ''
+                                    ? ' '
+                                    : this.textInputBox.value,
+                        },
+                        position: [sx, sy],
+                    });
+                },
+                false,
+            );
+
+            if (
+                this.curShape &&
+                this.curShape.__proto__.type === 'text' &&
+                this.curShape.style.text === ''
+            ) {
                 this.zr.remove(this.curShape);
             }
             let sx = this.sPoint.x - 15 * scaleFactor;
             let sy = this.sPoint.y - 15 * scaleFactor;
-            if ( sx <= 0) {
+            if (sx <= 0) {
                 sx = 0;
             }
             if (sy <= 0) {
@@ -357,7 +356,7 @@ class Toolbar {
 
         if (this.shape === 'path') {
             pathArray.push([this.ePoint.x, this.ePoint.y]);
-            console.log(pathArray);
+
             this.curShape.attr({
                 shape: {
                     points: pathArray,
@@ -397,7 +396,7 @@ class Toolbar {
                 cursor: 'move',
                 style: {
                     textPosition: [this.ePoint.x, this.ePoint.y],
-                }
+                },
             });
         }
     }
@@ -429,7 +428,6 @@ class Toolbar {
     }
 
     btnDownloadClickHandle() {
-        console.log(this.canvas);
         let url = this.canvas.toDataURL();
         remote.getCurrentWindow().hide();
         remote.dialog.showSaveDialog(

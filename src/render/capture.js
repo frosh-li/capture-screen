@@ -1,6 +1,11 @@
-// In the renderer process.
-console.log('preload');
-const { desktopCapturer, ipcRenderer, remote, clipboard, nativeImage } = require('electron');
+const {
+    desktopCapturer,
+    ipcRenderer,
+    remote,
+    clipboard,
+    nativeImage,
+} = require('electron'); // In the renderer process.
+
 let events = require('events');
 global.eventEmitter = new events.EventEmitter();
 const os = require('os');
@@ -10,12 +15,11 @@ const domContentLoadedHandler = require('../draw/canvas');
 let curWindow = remote.getCurrentWindow();
 let bounds = curWindow.getBounds();
 let curDisplay = require('electron').screen.getDisplayMatching(bounds);
-console.log('curDisplay', curDisplay);
-console.log('current window', curWindow);
+
 let allDisplay = require('electron').screen.getAllDisplays();
-console.log('all Display', allDisplay);
-allDisplay.forEach( (dis, i) => {
-    if(dis.id == curDisplay.id) {
+
+allDisplay.forEach((dis, i) => {
+    if (dis.id == curDisplay.id) {
         displayIndex = i;
     }
 });
@@ -26,12 +30,9 @@ function startCapture() {
             types: ['screen'],
         },
         (error, sources) => {
-            console.log('all source', sources, 'displayIndex', displayIndex);
             if (error) throw error;
             let curSource = sources[displayIndex];
 
-            console.log(curSource);
-            
             navigator.mediaDevices
                 .getUserMedia({
                     audio: false,
@@ -57,7 +58,6 @@ function handleStream(stream) {
     video.srcObject = stream;
     let hasShot = false;
     video.onloadedmetadata = e => {
-        console.log('metaloaded');
         if (hasShot) {
             return;
         }
@@ -75,19 +75,17 @@ function handleStream(stream) {
 
         const tracks = stream.getTracks();
         tracks[0].stop();
-        clipboard.writeImage(nativeImage.createFromDataURL(imageData), curDisplay.id);
-        // if (platform === 'win32') {
-        //     fs.writeFileSync(`/screenshot${curDisplay.id}.png`, imageData);
-            
-        // } else {
-        //     fs.writeFileSync(path.join(__dirname,`../../screenshot${curDisplay.id}.png`), imageData);
-        // }
+        clipboard.writeImage(
+            nativeImage.createFromDataURL(imageData),
+            curDisplay.id,
+        );
 
         setImmediate(() => {
             // curWindow.maximize();
             // curWindow.getNativeWindowHandle().
             curWindow.setFullScreen(true);
             curWindow.show();
+            curWindow.webContents.openDevTools();
             ipcRenderer.send('fullscreen', {
                 type: 'setfull',
                 width: canvas.width,
@@ -100,12 +98,9 @@ function handleStream(stream) {
     document.body.appendChild(video);
 }
 
-function handleError(e) {
-    console.log(e);
-}
+function handleError() {}
 
 ipcRenderer.on('startCapture', () => {
-    console.log('startCapture');
     setImmediate(() => {
         startCapture();
     });
@@ -113,3 +108,9 @@ ipcRenderer.on('startCapture', () => {
 ipcRenderer.on('handleEvent', (event, arg) => {
     domContentLoadedHandler(event, arg);
 });
+
+
+// window.addEventListener('keypress', (e) => {
+//     console.log(e);
+//     return true;
+// }, true);
