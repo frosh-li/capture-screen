@@ -67,29 +67,29 @@ function handleStream(stream) {
         }
         hasShot = true;
         video.play();
-        video.pause();
-        let canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        let ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        let imageData = canvas.toDataURL('image/png', 1);
-        document.body.style.backgroundImage = `url(${imageData})`;
-        document.body.removeChild(video);
+        setTimeout(() => {
+            let canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            let ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            let imageData = canvas.toDataURL('image/png', 1);
+            document.body.style.backgroundImage = `url(${imageData})`;
+            document.body.removeChild(video);
 
-        const tracks = stream.getTracks();
-        tracks[0].stop();
-        clipboard.writeImage(
-            nativeImage.createFromDataURL(imageData),
-            curDisplay.id,
-        );
+            const tracks = stream.getTracks();
+            tracks[0].stop();
+            clipboard.writeImage(
+                nativeImage.createFromDataURL(imageData),
+                curDisplay.id,
+            );
 
-        setImmediate(() => {
+        
             // curWindow.maximize();
             // curWindow.getNativeWindowHandle().
             // curWindow.setFullScreen(true);
             // curWindow.show();
-            //curWindow.webContents.openDevTools();
+            // curWindow.webContents.openDevTools();
             ipcRenderer.send('fullscreen', {
                 type: 'setfull',
                 width: canvas.width,

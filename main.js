@@ -18,7 +18,11 @@ let displayCounts = 0;
 app.on('ready', () => {
     win = createWindow();
     globalShortcut.register('Esc', () => {
-        app.quit();
+        displayCounts = 0;
+        win.hide();
+        ewin && ewin.hide();
+        win.reload();
+        ewin.reload();
     });
 
     globalShortcut.register('Delete', () => {
@@ -42,6 +46,8 @@ app.on('ready', () => {
         if(displayCounts === displays.length) {
             win.show();
             ewin && ewin.show();
+            //win.webContents.openDevTools();
+            //ewin.webContents.openDevTools();
         }
         if (arg.type === 'setfull') {
             event.sender.send('handleEvent', arg);
@@ -52,11 +58,8 @@ app.on('ready', () => {
         displayCounts = 0;
         win.hide();
         ewin && ewin.hide();
-        win = createWindow();
-        if (externalDisplay) {
-            ewin = createExternalWindow();
-        }
-        // app.quit();
+        win.reload();
+        ewin.reload();
     });
 
     globalShortcut.register('Ctrl+Alt+A', () => {
