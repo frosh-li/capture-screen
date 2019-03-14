@@ -14,7 +14,7 @@ function createWindow() {
         transparent: false,
         alwaysOnTop: true,
         show: false,
-        fullscreen: false,
+        fullscreen: true,
         resizable: false,
         maximize: false,
         maximizable: false,
@@ -22,6 +22,7 @@ function createWindow() {
         minimizable: false,
         modal: platform !== 'win32' ? false : true,
         kiosk: platform === 'win32' ? undefined : true,
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
     });
 
     win.on('closed', () => {
@@ -31,7 +32,7 @@ function createWindow() {
     // 或加载本地HTML文件
     win.loadFile(path.join(__dirname, 'assets/index.html'));
     win.webContents.on('did-finish-load', () => {
-        win.webContents.send('startCapture'); // 窗口已经最小化
+        //win.webContents.send('startCapture'); // 窗口已经最小化
     });
 
     return win;
@@ -54,7 +55,7 @@ function createExternalWindow() {
             transparent: false,
             alwaysOnTop: true,
             show: false,
-            fullscreen: false,
+            fullscreen: true,
             resizable: true,
             maximize: false,
             maximizable: false,
@@ -62,6 +63,7 @@ function createExternalWindow() {
             minimizable: false,
             modal: platform !== 'win32' ? false : true,
             kiosk: platform === 'win32' ? undefined : true,
+            backgroundColor: 'rgba(255, 255, 255, 0.5)',
         });
 
         ewin.loadFile(path.join(__dirname, 'assets/index.html'));
@@ -69,7 +71,7 @@ function createExternalWindow() {
             ewin = null;
         });
         ewin.webContents.on('did-finish-load', () => {
-            ewin.webContents.send('startCapture'); // 窗口已经最小化
+            //ewin.webContents.send('startCapture'); // 窗口已经最小化
         });
         return ewin;
     }

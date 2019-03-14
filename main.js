@@ -13,6 +13,7 @@ const { createWindow, createExternalWindow } = require('./src/createWindow');
 
 let win;
 let ewin;
+let displayCounts = 0;
 
 app.on('ready', () => {
     win = createWindow();
@@ -20,9 +21,9 @@ app.on('ready', () => {
         app.quit();
     });
 
-    // globalShortcut.register('Delete', () => {
-    //     win.webContents.send('deleteShape');
-    // });
+    globalShortcut.register('Delete', () => {
+        win.webContents.send('deleteShape');
+    });
 
     // globalShortcut.register('Backspace', () => {
     //     win.webContents.send('deleteShape');
@@ -37,15 +38,30 @@ app.on('ready', () => {
     }
 
     ipcMain.on('fullscreen', (event, arg) => {
+        displayCounts++;
+        if(displayCounts === displays.length) {
+            win.show();
+            ewin && ewin.show();
+        }
         if (arg.type === 'setfull') {
             event.sender.send('handleEvent', arg);
         }
     });
 
     ipcMain.on('closeapp', () => {
-        win.close();
-        ewin && ewin.close();
-        app.quit();
+        displayCounts = 0;
+        win.hide();
+        ewin && ewin.hide();
+        win = createWindow();
+        if (externalDisplay) {
+            ewin = createExternalWindow();
+        }
+        // app.quit();
+    });
+
+    globalShortcut.register('Ctrl+Alt+A', () => {
+        win.webContents.send('startCapture');
+        ewin && ewin.webContents.send('startCapture');
     });
 });
 

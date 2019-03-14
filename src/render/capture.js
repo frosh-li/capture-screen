@@ -15,9 +15,9 @@ const domContentLoadedHandler = require('../draw/canvas');
 let curWindow = remote.getCurrentWindow();
 let bounds = curWindow.getBounds();
 let curDisplay = require('electron').screen.getDisplayMatching(bounds);
-
+console.log('curDisplay', curDisplay);
 let allDisplay = require('electron').screen.getAllDisplays();
-
+console.log(allDisplay);
 allDisplay.forEach((dis, i) => {
     if (dis.id == curDisplay.id) {
         displayIndex = i;
@@ -31,6 +31,10 @@ function startCapture() {
         },
         (error, sources) => {
             if (error) throw error;
+            console.log('capturer source', sources);
+            sources.forEach(item => {
+                console.log(item.thumbnail.getSize())
+            })
             let curSource = sources[displayIndex];
 
             navigator.mediaDevices
@@ -83,9 +87,9 @@ function handleStream(stream) {
         setImmediate(() => {
             // curWindow.maximize();
             // curWindow.getNativeWindowHandle().
-            curWindow.setFullScreen(true);
-            curWindow.show();
-            curWindow.webContents.openDevTools();
+            // curWindow.setFullScreen(true);
+            // curWindow.show();
+            //curWindow.webContents.openDevTools();
             ipcRenderer.send('fullscreen', {
                 type: 'setfull',
                 width: canvas.width,
@@ -101,9 +105,7 @@ function handleStream(stream) {
 function handleError() {}
 
 ipcRenderer.on('startCapture', () => {
-    setImmediate(() => {
-        startCapture();
-    });
+    startCapture();
 });
 ipcRenderer.on('handleEvent', (event, arg) => {
     domContentLoadedHandler(event, arg);
