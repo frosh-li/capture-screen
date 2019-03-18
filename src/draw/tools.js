@@ -77,17 +77,17 @@ class Toolbar {
         ];
 
         this.penColor = 'red';
+        this.initZrender();
     }
     init() {
         this.btnGroup.forEach(btn => {
             let handle = `${btn}ClickHandle`;
-
             this[btn].addEventListener(
                 'mousedown',
                 e => {
                     this.setToolbarHighlight(btn);
                     eventEmitter.emit('startDrawInCanvas');
-                    if (canBeDrawShape === false) {
+                    if (canBeDrawShape === false && btn != 'btnDownload' && btn!= 'btnOk') {
                         this.initZrender();
                         canBeDrawShape = true;
                     }
@@ -123,6 +123,7 @@ class Toolbar {
      * 将背景图绘制上来
      */
     initZrender() {
+        console.log('init zrender');
         let tmpCanvas = document.createElement('canvas');
         tmpCanvas.width = this.canvas.width;
         tmpCanvas.height = this.canvas.height;
@@ -427,8 +428,9 @@ class Toolbar {
     }
 
     btnDownloadClickHandle() {
-        let url = this.canvas.toDataURL();
-        remote.getCurrentWindow().hide();
+        console.log(this.zr);
+        let url = this.zr.dom.toDataURL();
+        ipcRenderer.send('hidewin');
         remote.dialog.showSaveDialog(
             {
                 filters: [
@@ -461,13 +463,13 @@ class Toolbar {
             return;
         }
         let url = this.canvas.toDataURL();
-        remote.getCurrentWindow().hide();
-
+        ipcRenderer.send('hidewin');
+        clipboard.writeImage(nativeImage.createFromDataURL(url));
         this.audio.play();
         this.audio.onended = () => {
             ipcRenderer.send('closeapp');
         };
-        clipboard.writeImage(nativeImage.createFromDataURL(url));
+        
     }
 }
 

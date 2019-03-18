@@ -46,8 +46,8 @@ app.on('ready', () => {
         if(displayCounts === displays.length) {
             win.show();
             ewin && ewin.show();
-            // win.webContents.openDevTools();
-            // ewin && ewin.webContents.openDevTools();
+            win.webContents.openDevTools();
+            ewin && ewin.webContents.openDevTools();
         }
         if (arg.type === 'setfull') {
             event.sender.send('handleEvent', arg);
@@ -60,6 +60,11 @@ app.on('ready', () => {
         ewin && ewin.hide();
         win.reload();
         ewin && ewin.reload();
+    });
+
+    ipcMain.on('hidewin', () => {
+        win && win.hide();
+        ewin && ewin.hide();
     });
 
     globalShortcut.register('Ctrl+Alt+A', () => {

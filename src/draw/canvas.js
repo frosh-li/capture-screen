@@ -2,6 +2,7 @@ const clipboard = require('electron').clipboard;
 const nativeImage = require('electron').nativeImage;
 const ipcRenderer = require('electron').ipcRenderer;
 const mineType = require('mime-types');
+const Toolbar = require('../draw/tools');
 const {
     CanvasMousedown,
     CanvasMouseup,
@@ -150,15 +151,13 @@ function domContentLoadedHandler(_, arg) {
         }
 
         setTimeout(() => {
+            new Toolbar().init();
             drawTools([
                 Math.max(curPoint[0], startPoint[0]),
                 Math.max(curPoint[1], startPoint[1]),
             ]);
         }, 0);
     }
-
-    const Toolbar = require('../draw/tools');
-    new Toolbar().init();
 
     eventEmitter.on('startDrawInCanvas', () => {
         canvas.removeEventListener('mousedown', CanvasMousedown, false);
