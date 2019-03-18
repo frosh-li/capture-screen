@@ -1,4 +1,7 @@
 const clipboard = require('electron').clipboard;
+const nativeImage = require('electron').nativeImage;
+const ipcRenderer = require('electron').ipcRenderer;
+const mineType = require('mime-types');
 const {
     CanvasMousedown,
     CanvasMouseup,
@@ -8,6 +11,9 @@ const {
 } = require('./canvasHandle');
 
 const remote = require('electron').remote;
+const os = require('os');
+const path = require('path');
+const fs = require('fs');
 let curWindow = remote.getCurrentWindow();
 let bounds = curWindow.getBounds();
 let curDisplay = require('electron').screen.getDisplayMatching(bounds);
@@ -26,7 +32,7 @@ function domContentLoadedHandler(_, arg) {
 
     const mask = document.querySelector('#mask');
 
-    let imageData;
+
     // if (platform === 'win32') {
     //     imageData = fs.readFileSync(`/screenshot${curDisplay.id}.png`).toString('utf-8');
     // } else {
@@ -34,15 +40,26 @@ function domContentLoadedHandler(_, arg) {
     // }
     // imageData = clipboard.readImage(curDisplay.id);
     // let image = nativeImage.createFromDataURL(imageData);
-    let image = clipboard.readImage(curDisplay.id);
+    
+    let filePath = path.join(os.tmpdir(), curDisplay.id + '.png');
+    let imageData = fs.readFileSync(filePath).toString('base64');
+    // let image = nativeImage.createFromDataURL(imageData);
     let htmlImage = new Image();
-    htmlImage.src = image.toDataURL();
-    htmlImage.onload = htmlImage.complete = function() {
+    
+    htmlImage.addEventListener('load',function() {
+        console.log('load html success');
         bgCanvas.getContext('2d').drawImage(htmlImage, 0, 0);
         htmlImage = null;
-    };
-    //
-
+    });
+    htmlImage.src = filePath + '?' + (+new Date());
+    console.log('filePath', filePath, 'start to load');
+    // let base64 = 'data:' + mineType.lookup(filePath) + ';base64,' + imageData;
+    // console.log('image base64', base64);
+    // let htmlImage = new Image();
+    // htmlImage.src = base64;
+    // document.body.appendChild(htmlImage);
+    // bgCanvas.getContext('2d').drawImage(htmlImage, 0, 0);
+    //htmlImage = null;
     document.addEventListener('mousedown', readyDrawCanvas, false);
     document.addEventListener('mousemove', startDrawCanvas, false);
     document.addEventListener('mouseup', endDrawCanvas, false);

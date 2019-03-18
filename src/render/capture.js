@@ -16,43 +16,61 @@ let curWindow = remote.getCurrentWindow();
 let bounds = curWindow.getBounds();
 let curDisplay = require('electron').screen.getDisplayMatching(bounds);
 console.log('curDisplay', curDisplay);
-let allDisplay = require('electron').screen.getAllDisplays();
-console.log(allDisplay);
-allDisplay.forEach((dis, i) => {
-    if (dis.id == curDisplay.id) {
-        displayIndex = i;
-    }
-});
+const fs = require('fs');
+const path = require('path');
+
 
 function startCapture() {
+    let allDisplay = require('electron').screen.getAllDisplays();
+    console.log(allDisplay);
+    allDisplay.forEach((dis, i) => {
+        if (dis.id == curDisplay.id) {
+            displayIndex = i;
+        }
+    });
     desktopCapturer.getSources(
         {
             types: ['screen'],
+            thumbnailSize: curDisplay.size,
         },
         (error, sources) => {
             if (error) throw error;
             console.log('capturer source', sources);
-            sources.forEach(item => {
-                console.log(item.thumbnail.getSize())
-            })
+            // sources.forEach(source => {
+            //     fs.writeFile(path.join(os.tmpdir(), source.name+'.png'), source.thumbnail.toPNG(), function(err) {
+            //         if(err){
+            //             console.log(err);
+            //         }
+            //     });
+            // });
             let curSource = sources[displayIndex];
-
-            navigator.mediaDevices
-                .getUserMedia({
-                    audio: false,
-                    video: {
-                        mandatory: {
-                            chromeMediaSource: 'desktop',
-                            chromeMediaSourceId: curSource.id,
-                            minWidth: 1280,
-                            maxWidth: 8000,
-                            minHeight: 720,
-                            maxHeight: 8000,
-                        },
-                    },
-                })
-                .then(stream => handleStream(stream))
-                .catch(e => handleError(e));
+            fs.writeFileSync(path.join(os.tmpdir(), curDisplay.id+'.png'), curSource.thumbnail.toPNG());
+            let thumbnail = sources[displayIndex].thumbnail.toDataURL();
+            //setTimeout(() => {
+            document.body.style.backgroundImage = `url(${thumbnail})`;
+            ipcRenderer.send('fullscreen', {
+                type: 'setfull',
+                width: curDisplay.size.width,
+                height: curDisplay.size.height,
+                win: curWindow,
+            }); // 通知最大化窗口
+            //});
+            // navigator.mediaDevices
+            //     .getUserMedia({
+            //         audio: false,
+            //         video: {
+            //             mandatory: {
+            //                 chromeMediaSource: 'desktop',
+            //                 chromeMediaSourceId: curSource.id,
+            //                 minWidth: 1280,
+            //                 maxWidth: 8000,
+            //                 minHeight: 720,
+            //                 maxHeight: 8000,
+            //             },
+            //         },
+            //     })
+            //     .then(stream => handleStream(stream))
+            //     .catch(e => handleError(e));
         },
     );
 }

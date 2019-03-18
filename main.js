@@ -14,7 +14,7 @@ const { createWindow, createExternalWindow } = require('./src/createWindow');
 let win;
 let ewin;
 let displayCounts = 0;
-
+console.log(os.tmpdir());
 app.on('ready', () => {
     win = createWindow();
     globalShortcut.register('Esc', () => {
@@ -46,8 +46,8 @@ app.on('ready', () => {
         if(displayCounts === displays.length) {
             win.show();
             ewin && ewin.show();
-            //win.webContents.openDevTools();
-            //ewin.webContents.openDevTools();
+            win.webContents.openDevTools();
+            ewin && ewin.webContents.openDevTools();
         }
         if (arg.type === 'setfull') {
             event.sender.send('handleEvent', arg);
