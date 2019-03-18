@@ -42,7 +42,6 @@ function domContentLoadedHandler(_, arg) {
     // let image = nativeImage.createFromDataURL(imageData);
     
     let filePath = path.join(os.tmpdir(), curDisplay.id + '.png');
-    let imageData = fs.readFileSync(filePath).toString('base64');
     // let image = nativeImage.createFromDataURL(imageData);
     let htmlImage = new Image();
     
@@ -52,7 +51,6 @@ function domContentLoadedHandler(_, arg) {
         htmlImage = null;
     });
     htmlImage.src = filePath + '?' + (+new Date());
-    console.log('filePath', filePath, 'start to load');
     // let base64 = 'data:' + mineType.lookup(filePath) + ';base64,' + imageData;
     // console.log('image base64', base64);
     // let htmlImage = new Image();
