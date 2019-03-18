@@ -10,6 +10,21 @@ let startToDrawShape = false;
 let dragingShape = false;
 let pathArray = [];
 
+const {
+    hideTools,
+} = require('./canvasHandle');
+
+function hideCanavs() {
+    let canvas = document.querySelector('#js-canvas');
+    canvas.style.cssText = `
+        left: -9999px;
+        top: -9999px;
+        display: none;
+        width: 0;
+        height: 0;
+    `;
+}
+
 // 继承箭头形状
 let ArrowShape = new zrender.Path.extend({
     type: 'Arrow',
@@ -416,6 +431,9 @@ class Toolbar {
     }
 
     btnCloseClickHandle() {
+        zrender.dispose();
+        hideCanavs()
+        hideTools();
         ipcRenderer.send('closeapp');
     }
 
@@ -450,8 +468,14 @@ class Toolbar {
                             'base64',
                         ),
                     );
+                    zrender.dispose();
+                    hideCanavs()
+                    hideTools();
                     ipcRenderer.send('closeapp');
                 } else {
+                    zrender.dispose();
+                    hideCanavs()
+                    hideTools();
                     ipcRenderer.send('closeapp');
                 }
             },
@@ -467,6 +491,9 @@ class Toolbar {
         clipboard.writeImage(nativeImage.createFromDataURL(url));
         this.audio.play();
         this.audio.onended = () => {
+            zrender.dispose();
+            hideTools();
+            hideCanavs()
             ipcRenderer.send('closeapp');
         };
         
