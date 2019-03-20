@@ -47,6 +47,7 @@ function domContentLoadedHandler(_, arg) {
     let htmlImage = new Image();
     
     htmlImage.addEventListener('load',function() {
+        console.log('imagesize', htmlImage.width, htmlImage.height);
         console.log('load html success');
         bgCanvas.getContext('2d').drawImage(htmlImage, 0, 0);
         htmlImage = null;

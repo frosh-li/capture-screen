@@ -18,6 +18,7 @@ let curDisplay = require('electron').screen.getDisplayMatching(bounds);
 console.log('curDisplay', curDisplay);
 const fs = require('fs');
 const path = require('path');
+const scaleFactor = curDisplay.scaleFactor;
 
 
 function startCapture() {
@@ -31,7 +32,10 @@ function startCapture() {
     desktopCapturer.getSources(
         {
             types: ['screen'],
-            thumbnailSize: curDisplay.size,
+            thumbnailSize: {
+                width: curDisplay.size.width * scaleFactor,
+                height: curDisplay.size.height * scaleFactor,
+            }
         },
         (error, sources) => {
             if (error) throw error;
@@ -50,8 +54,8 @@ function startCapture() {
             document.body.style.backgroundImage = `url(${thumbnail})`;
             ipcRenderer.send('fullscreen', {
                 type: 'setfull',
-                width: curDisplay.size.width,
-                height: curDisplay.size.height,
+                width: curDisplay.size.width * scaleFactor,
+                height: curDisplay.size.height * scaleFactor,
                 win: curWindow,
             }); // 通知最大化窗口
             //});

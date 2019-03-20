@@ -14,7 +14,7 @@ function createWindow() {
         transparent: true,
         alwaysOnTop: true,
         show: false,
-        fullscreen: true,
+        fullscreen: platform === 'win32' ? true : false,
         resizable: false,
         maximize: false,
         maximizable: false,
@@ -31,6 +31,7 @@ function createWindow() {
 
     // 或加载本地HTML文件
     win.loadFile(path.join(__dirname, 'assets/index.html'));
+    win.webContents.openDevTools();
     win.webContents.on('did-finish-load', () => {
         //win.webContents.send('startCapture'); // 窗口已经最小化
     });
