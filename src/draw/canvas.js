@@ -1,7 +1,6 @@
 const clipboard = require('electron').clipboard;
 const nativeImage = require('electron').nativeImage;
 const ipcRenderer = require('electron').ipcRenderer;
-const mineType = require('mime-types');
 const Toolbar = require('../draw/tools');
 const {
     CanvasMousedown,

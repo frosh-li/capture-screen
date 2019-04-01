@@ -64,6 +64,7 @@ app.on('ready', () => {
     });
 
     globalShortcut.register('Ctrl+Alt+A', () => {
+        console.log('start to cap');
         win.webContents.send('startCapture');
         ewin && ewin.webContents.send('startCapture');
     });
