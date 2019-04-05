@@ -19,8 +19,10 @@ app.on('ready', () => {
     win = createWindow();
     globalShortcut.register('Esc', () => {
         displayCounts = 0;
-        win.hide();
-        ewin && ewin.hide();
+        win.webContents.send('onEsc');
+        ewin && ewin.webContents.send('onEsc');
+        // win.hide();
+        // ewin && ewin.hide();
     });
 
     globalShortcut.register('Delete', () => {

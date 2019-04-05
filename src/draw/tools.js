@@ -493,11 +493,19 @@ class Toolbar {
         this.audio.onended = () => {
             zrender.dispose();
             hideTools();
-            hideCanavs()
+            hideCanavs();
             ipcRenderer.send('closeapp');
         };
         
     }
 }
+
+ipcRenderer.on('onEsc', () => {
+    ipcRenderer.send('hidewin');
+    zrender.dispose();
+    hideCanavs()
+    hideTools();
+    ipcRenderer.send('closeapp');
+})
 
 module.exports = Toolbar;
