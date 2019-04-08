@@ -95,22 +95,26 @@ class Toolbar {
         this.initZrender();
     }
     init() {
+        console.log('start to init tools');
+        let self = this;
         this.btnGroup.forEach(btn => {
             let handle = `${btn}ClickHandle`;
+            function BtnHandle(e) {
+                self.setToolbarHighlight(btn);
+                eventEmitter.emit('startDrawInCanvas');
+                if (canBeDrawShape === false && btn != 'btnDownload' && btn!= 'btnOk') {
+                    self.initZrender();
+                    canBeDrawShape = true;
+                }
+                e.preventDefault();
+                e.stopPropagation();
+
+                self[handle]();
+            }
+            this[btn].removeEventListener('mousedown', BtnHandle, false);
             this[btn].addEventListener(
                 'mousedown',
-                e => {
-                    this.setToolbarHighlight(btn);
-                    eventEmitter.emit('startDrawInCanvas');
-                    if (canBeDrawShape === false && btn != 'btnDownload' && btn!= 'btnOk') {
-                        this.initZrender();
-                        canBeDrawShape = true;
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    this[handle]();
-                },
+                BtnHandle,
                 false,
             );
         });
@@ -432,7 +436,7 @@ class Toolbar {
 
     btnCloseClickHandle() {
         zrender.dispose();
-        hideCanavs()
+        hideCanavs();
         hideTools();
         ipcRenderer.send('closeapp');
     }
@@ -483,28 +487,21 @@ class Toolbar {
     }
 
     btnOkClickHandle() {
+        console.log('clicked on ok');
         if (this.canvas.width === 0 || this.canvas.height === 0) {
             return;
         }
         let url = this.canvas.toDataURL();
-        ipcRenderer.send('hidewin');
-        clipboard.writeImage(nativeImage.createFromDataURL(url));
-        this.audio.play();
-        this.audio.onended = () => {
-            zrender.dispose();
-            hideTools();
-            hideCanavs();
-            ipcRenderer.send('closeapp');
-        };
         
+        clipboard.writeImage(nativeImage.createFromDataURL(url));
+        zrender.dispose();
+        hideTools();
+        hideCanavs();
+        ipcRenderer.send('closeapp');
     }
 }
 
 ipcRenderer.on('onEsc', () => {
-    ipcRenderer.send('hidewin');
-    zrender.dispose();
-    hideCanavs()
-    hideTools();
     ipcRenderer.send('closeapp');
 })
 

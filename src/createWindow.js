@@ -11,29 +11,27 @@ function createWindow() {
         width: bounds.width,
         height: bounds.height,
         frame: false,
-        transparent: true,
+        transparent: false,
         alwaysOnTop: true,
         show: false,
-        fullscreen: platform === 'win32' ? true : false,
+        fullscreen: false,
         resizable: false,
-        maximize: false,
-        maximizable: false,
-        enableLargerThanScreen: true,
-        minimizable: false,
-        modal: platform !== 'win32' ? false : true,
-        kiosk: platform === 'win32' ? undefined : true,
-        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+        maximize: true,
+        maximizable: true,
+        modal: true,
     });
 
     win.on('closed', () => {
         win = null;
     });
 
+
     // 或加载本地HTML文件
     win.loadFile(path.join(__dirname, 'assets/index.html'));
     // win.webContents.openDevTools();
     win.webContents.on('did-finish-load', () => {
         //win.webContents.send('startCapture'); // 窗口已经最小化
+        
     });
 
     return win;
@@ -53,18 +51,14 @@ function createExternalWindow() {
             width: externalDisplay.bounds.width,
             height: externalDisplay.bounds.height,
             frame: false,
-            transparent: true,
+            transparent: false,
             alwaysOnTop: true,
             show: false,
-            fullscreen: true,
-            resizable: true,
-            maximize: false,
-            maximizable: false,
-            enableLargerThanScreen: true,
-            minimizable: false,
-            modal: platform !== 'win32' ? false : true,
-            kiosk: platform === 'win32' ? undefined : true,
-            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+            fullscreen: false,
+            resizable: false,
+            maximize: true,
+            maximizable: true,
+            modal: true,
         });
 
         ewin.loadFile(path.join(__dirname, 'assets/index.html'));

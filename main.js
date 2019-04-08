@@ -5,7 +5,7 @@
 */
 
 const { app, globalShortcut, ipcMain } = require('electron');
-
+const path = require('path');
 const os = require('os');
 const platform = os.platform();
 
@@ -15,19 +15,15 @@ let win;
 let ewin;
 let displayCounts = 0;
 console.log(os.tmpdir());
+
+function unRegisterShortcut() {
+    globalShortcut.unregister('Esc');
+    globalShortcut.unregister('Delete');
+}
+
 app.on('ready', () => {
     win = createWindow();
-    globalShortcut.register('Esc', () => {
-        displayCounts = 0;
-        win.webContents.send('onEsc');
-        ewin && ewin.webContents.send('onEsc');
-        // win.hide();
-        // ewin && ewin.hide();
-    });
-
-    globalShortcut.register('Delete', () => {
-        win.webContents.send('deleteShape');
-    });
+    
 
     // globalShortcut.register('Backspace', () => {
     //     win.webContents.send('deleteShape');
@@ -45,7 +41,8 @@ app.on('ready', () => {
         displayCounts++;
         if(displayCounts === displays.length) {
             win.show();
-            ewin && ewin.show();
+            win.setFullScreen(true);
+            ewin && ewin.show() && ewin.setFullScreen(true);
             // win.webContents.openDevTools();
             // ewin && ewin.webContents.openDevTools();
         }
@@ -56,19 +53,28 @@ app.on('ready', () => {
 
     ipcMain.on('closeapp', () => {
         displayCounts = 0;
+        unRegisterShortcut();
+        win.reload();
         win.hide();
-        ewin && ewin.hide();
-    });
-
-    ipcMain.on('hidewin', () => {
-        win && win.hide();
-        ewin && ewin.hide();
+        ewin && ewin.reload() && ewin.hide();
     });
 
     globalShortcut.register('Ctrl+Alt+A', () => {
         console.log('start to cap');
         win.webContents.send('startCapture');
         ewin && ewin.webContents.send('startCapture');
+
+        globalShortcut.register('Esc', () => {
+            displayCounts = 0;
+            unRegisterShortcut();
+            win.reload();
+            win.hide();
+            ewin && ewin.reload() && ewin.hide();
+        });
+    
+        globalShortcut.register('Delete', () => {
+            win.webContents.send('deleteShape');
+        });
     });
 });
 
