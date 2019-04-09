@@ -32,10 +32,10 @@ function startCapture() {
     desktopCapturer.getSources(
         {
             types: ['screen'],
-            thumbnailSize: {
-                width: curDisplay.size.width * scaleFactor,
-                height: curDisplay.size.height * scaleFactor,
-            }
+            // thumbnailSize: {
+            //     width: curDisplay.size.width * scaleFactor,
+            //     height: curDisplay.size.height * scaleFactor,
+            // }
         },
         (error, sources) => {
             if (error) throw error;
@@ -48,83 +48,78 @@ function startCapture() {
             //     });
             // });
             let curSource = sources[displayIndex];
-            fs.writeFileSync(path.join(os.tmpdir(), curDisplay.id+'.png'), curSource.thumbnail.toPNG());
-            let thumbnail = sources[displayIndex].thumbnail.toDataURL();
-            //setTimeout(() => {
-            document.body.style.backgroundImage = `url(${thumbnail})`;
-            ipcRenderer.send('fullscreen', {
-                type: 'setfull',
-                width: curDisplay.size.width * scaleFactor,
-                height: curDisplay.size.height * scaleFactor,
-                win: curWindow,
-            }); // 通知最大化窗口
+            // fs.writeFileSync(path.join(os.tmpdir(), curDisplay.id+'.png'), curSource.thumbnail.toPNG());
+            // let thumbnail = sources[displayIndex].thumbnail.toDataURL();
+            // //setTimeout(() => {
+            // document.body.style.backgroundImage = `url(${thumbnail})`;
+            // ipcRenderer.send('fullscreen', {
+            //     type: 'setfull',
+            //     width: curDisplay.size.width * scaleFactor,
+            //     height: curDisplay.size.height * scaleFactor,
+            //     win: curWindow,
+            // }); // 通知最大化窗口
             //});
-            // navigator.mediaDevices
-            //     .getUserMedia({
-            //         audio: false,
-            //         video: {
-            //             mandatory: {
-            //                 chromeMediaSource: 'desktop',
-            //                 chromeMediaSourceId: curSource.id,
-            //                 minWidth: 1280,
-            //                 maxWidth: 8000,
-            //                 minHeight: 720,
-            //                 maxHeight: 8000,
-            //             },
-            //         },
-            //     })
-            //     .then(stream => handleStream(stream))
-            //     .catch(e => handleError(e));
+            navigator.mediaDevices
+                .getUserMedia({
+                    audio: false,
+                    video: {
+                        mandatory: {
+                            chromeMediaSource: 'desktop',
+                            chromeMediaSourceId: curSource.id,
+                            minWidth: 1280,
+                            maxWidth: 8000,
+                            minHeight: 720,
+                            maxHeight: 8000,
+                        },
+                    },
+                })
+                .then(stream => handleStream(stream))
+                .catch(e => handleError(e));
         },
     );
 }
 
 function handleStream(stream) {
     const video = document.createElement('video');
-    video.srcObject = stream;
-    let hasShot = false;
-    video.onloadedmetadata = e => {
-        if (hasShot) {
-            return;
-        }
-        hasShot = true;
+    
+    video.addEventListener('play', () => {
+        video.pause();
+        let canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        let imageData = canvas.toDataURL('image/png', 1);
+        document.body.style.backgroundImage = `url(${imageData})`;
+        // document.body.removeChild(video);
+
+        const tracks = stream.getTracks();
+        tracks[0].stop();
+        // clipboard.writeImage(
+        //     nativeImage.createFromDataURL(imageData),
+        //     curDisplay.id,
+        // );
+        let base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
+        let dataBuffer = new Buffer(base64Data, 'base64');
+        fs.writeFileSync(path.join(os.tmpdir(), curDisplay.id+'.png'), dataBuffer);
+        document.body.removeChild(video);
+        ipcRenderer.send('fullscreen', {
+            type: 'setfull',
+            width: canvas.width,
+            height: canvas.height,
+            win: curWindow,
+        }); // 通知最大化窗口
+    });
+    video.addEventListener('canplay', function() {
         video.play();
-        setTimeout(() => {
-            let canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            let ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            let imageData = canvas.toDataURL('image/png', 1);
-            document.body.style.backgroundImage = `url(${imageData})`;
-            document.body.removeChild(video);
-
-            const tracks = stream.getTracks();
-            tracks[0].stop();
-            clipboard.writeImage(
-                nativeImage.createFromDataURL(imageData),
-                curDisplay.id,
-            );
-
-        
-            // curWindow.maximize();
-            // curWindow.getNativeWindowHandle().
-            // curWindow.setFullScreen(true);
-            // curWindow.show();
-            // curWindow.webContents.openDevTools();
-            ipcRenderer.send('fullscreen', {
-                type: 'setfull',
-                width: canvas.width,
-                height: canvas.height,
-                win: curWindow,
-            }); // 通知最大化窗口
-        });
-    };
-
+    });
+    video.srcObject = stream;
     document.body.appendChild(video);
 }
 
-function handleError() {}
+function handleError() {
+    console.log('屏幕捕捉失败');
+}
 
 ipcRenderer.on('startCapture', () => {
     startCapture();
