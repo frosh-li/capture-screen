@@ -452,7 +452,6 @@ class Toolbar {
     btnDownloadClickHandle() {
         console.log(this.zr);
         let url = this.zr.dom.toDataURL();
-        ipcRenderer.send('hidewin');
         remote.dialog.showSaveDialog(
             {
                 filters: [

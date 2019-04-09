@@ -92,15 +92,12 @@ function handleStream(stream) {
         let imageData = canvas.toDataURL('image/png', 1);
         document.body.style.backgroundImage = `url(${imageData})`;
         // document.body.removeChild(video);
-
-        const tracks = stream.getTracks();
-        tracks[0].stop();
         // clipboard.writeImage(
         //     nativeImage.createFromDataURL(imageData),
         //     curDisplay.id,
         // );
         let base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
-        let dataBuffer = new Buffer(base64Data, 'base64');
+        let dataBuffer = Buffer.from(base64Data, 'base64');
         fs.writeFileSync(path.join(os.tmpdir(), curDisplay.id+'.png'), dataBuffer);
         document.body.removeChild(video);
         ipcRenderer.send('fullscreen', {

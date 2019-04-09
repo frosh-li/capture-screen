@@ -14,6 +14,7 @@ const { createWindow, createExternalWindow } = require('./src/createWindow');
 let win;
 let ewin;
 let displayCounts = 0;
+let didLoad = false;
 console.log(os.tmpdir());
 
 function unRegisterShortcut() {
@@ -23,7 +24,9 @@ function unRegisterShortcut() {
 
 app.on('ready', () => {
     win = createWindow();
-    
+    win.webContents.on('did-finish-load', () => {
+        didLoad = true;  
+    });
 
     // globalShortcut.register('Backspace', () => {
     //     win.webContents.send('deleteShape');
@@ -53,6 +56,7 @@ app.on('ready', () => {
 
     ipcMain.on('closeapp', () => {
         displayCounts = 0;
+        didLoad = false;
         unRegisterShortcut();
         win.reload();
         win.hide();
@@ -60,6 +64,10 @@ app.on('ready', () => {
     });
 
     globalShortcut.register('Ctrl+Alt+A', () => {
+        if(!didLoad) {
+            console.log('content not loaded, please try again');
+            return;
+        }
         console.log('start to cap');
         win.webContents.send('startCapture');
         ewin && ewin.webContents.send('startCapture');
