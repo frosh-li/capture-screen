@@ -32,10 +32,10 @@ function startCapture() {
     desktopCapturer.getSources(
         {
             types: ['screen'],
-            // thumbnailSize: {
-            //     width: curDisplay.size.width * scaleFactor,
-            //     height: curDisplay.size.height * scaleFactor,
-            // }
+            thumbnailSize: {
+                width: Math.floor(curDisplay.size.width * scaleFactor),
+                height: Math.floor(curDisplay.size.height * scaleFactor),
+            }
         },
         (error, sources) => {
             if (error) throw error;
@@ -48,33 +48,33 @@ function startCapture() {
             //     });
             // });
             let curSource = sources[displayIndex];
-            // fs.writeFileSync(path.join(os.tmpdir(), curDisplay.id+'.png'), curSource.thumbnail.toPNG());
-            // let thumbnail = sources[displayIndex].thumbnail.toDataURL();
-            // //setTimeout(() => {
-            // document.body.style.backgroundImage = `url(${thumbnail})`;
-            // ipcRenderer.send('fullscreen', {
-            //     type: 'setfull',
-            //     width: curDisplay.size.width * scaleFactor,
-            //     height: curDisplay.size.height * scaleFactor,
-            //     win: curWindow,
-            // }); // 通知最大化窗口
+            fs.writeFileSync(path.join(os.tmpdir(), curDisplay.id+'.png'), curSource.thumbnail.toPNG());
+            let thumbnail = sources[displayIndex].thumbnail.toDataURL();
+            //setTimeout(() => {
+            document.body.style.backgroundImage = `url(${thumbnail})`;
+            ipcRenderer.send('fullscreen', {
+                type: 'setfull',
+                width: curDisplay.size.width * scaleFactor,
+                height: curDisplay.size.height * scaleFactor,
+                win: curWindow,
+            }); // 通知最大化窗口
             //});
-            navigator.mediaDevices
-                .getUserMedia({
-                    audio: false,
-                    video: {
-                        mandatory: {
-                            chromeMediaSource: 'desktop',
-                            chromeMediaSourceId: curSource.id,
-                            minWidth: 1280,
-                            maxWidth: 8000,
-                            minHeight: 720,
-                            maxHeight: 8000,
-                        },
-                    },
-                })
-                .then(stream => handleStream(stream))
-                .catch(e => handleError(e));
+            // navigator.mediaDevices
+            //     .getUserMedia({
+            //         audio: false,
+            //         video: {
+            //             mandatory: {
+            //                 chromeMediaSource: 'desktop',
+            //                 chromeMediaSourceId: curSource.id,
+            //                 minWidth: 1280,
+            //                 maxWidth: 8000,
+            //                 minHeight: 720,
+            //                 maxHeight: 8000,
+            //             },
+            //         },
+            //     })
+            //     .then(stream => handleStream(stream))
+            //     .catch(e => handleError(e));
         },
     );
 }
@@ -83,7 +83,6 @@ function handleStream(stream) {
     const video = document.createElement('video');
     
     video.addEventListener('play', () => {
-        video.pause();
         let canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
@@ -99,6 +98,7 @@ function handleStream(stream) {
         let base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
         let dataBuffer = Buffer.from(base64Data, 'base64');
         fs.writeFileSync(path.join(os.tmpdir(), curDisplay.id+'.png'), dataBuffer);
+        video.pause();
         document.body.removeChild(video);
         ipcRenderer.send('fullscreen', {
             type: 'setfull',
